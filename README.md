@@ -1,6 +1,6 @@
 # Template for contribution to Computo
 Jane Doe, John Doe
-2026-07-07
+2026-09-23
 
 ### Citation
 
@@ -10,7 +10,7 @@ Submitted to Computo.
 
 [![build and
 publish](https://github.com/computorg/template-computo-R/actions/workflows/build.yml/badge.svg)](https://github.com/computorg/template-computo-R/actions/workflows/build.yml)
-[![reviews](https://img.shields.io/badge/review-report-blue)](https://github.com/computorg/template-computo-R/issues?q=is%3Aopen+is%3Aissue+label%3Areview)
+[![reviews](https://img.shields.io/badge/review-report-blue)](https://github.com/computorg/template-computo-R/issues?q=is:open is:issue label:review)
 [![SWH](https://archive.softwareheritage.org/badge/origin/https://github.com/computorg/template-computo-R)](https://archive.softwareheritage.org/browse/origin/?origin_url=https://github.com/computorg/template-computo-R)
 [![DOI:10.5072/computo.0000](https://img.shields.io/badge/DOI-10.5072%2Fcomputo.0000-034E79.svg)](https://doi.org/10.5072/computo.0000)
 [![Creative Commons
