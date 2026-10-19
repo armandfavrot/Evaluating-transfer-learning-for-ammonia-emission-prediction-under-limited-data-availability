@@ -4,46 +4,63 @@ project:
     - main.qmd
     - README.qmd
 
-title: "Template for contribution to Computo"
-subtitle: "Example dedicated to `R` users"
+execute:
+  echo: false
+  warning: false
+  message: false
+  cache: true
+  freeze: false
+
+title: "Evaluating transfer learning for ammonia emission prediction under limited data availability"
 author:
-  - name: Jane Doe
+  - name: Armand Favrot
     corresponding: true
-    email: janedoe@nowhere.moon
-    url: https://janedoe.someplace.themoon.org
-    orcid: 0000-0000-0000-0000
+    email: armand.favrot@inrae.fr
     affiliations:
-      - name: Name of Affiliation one
-        department: Statistics
-        url: https://someplace.themoon.org
-  - name: John Doe
-    email: johndoe@nowhere.moon
-    url: https://johndoe.someplace.themoon.org
-    orcid: 0000-0000-0000-0000
+      - ref: ecosys
+      - ref: mia
+  - name: Sophie Génermont
     affiliations:
-      - name: Name of Affiliation two
-        department: Computer Science
-        url: https://someplace.themoon.org
+      - ref: ecosys
+  - name: Vincent Guigue
+    affiliations:
+      - ref: mia
+  - name: Céline Décuq
+    affiliations:
+      - ref: ecosys
+  - name: David Makowski
+    affiliations:
+      - ref: mia
+affiliations:
+  - id: ecosys
+    name: Université Paris-Saclay, INRAE, AgroParisTech, UMR EcoSys, Palaiseau, 91120, France
+  - id: mia
+    name: Université Paris-Saclay, INRAE, AgroParisTech, UMR MIA-PS, Palaiseau, 91120, France
+
 date: last-modified
 date-modified: last-modified
-abstract: >+
-  Template for preparing a submission to Computo, using the [quarto journal extension](https://github.com/computorg/computo-quarto-extension), the knitr kernel (R user) and [renv](https://rstudio.github.io/renv/articles/renv.html) to set up the dependencies.
-  
-  For a detailed, step-by-step guide on preparing your article, setting up the continuous integration and submitting it to Computo, please consult the [guidelines for authors](https://computo-journal.org/site/guidelines-authors.html).
-keywords: [key1, key2, key3]
+abstract: >-
+  Because ammonia is a major air pollutant, experimental datasets describing ammonia emissions following fertilizer application have expanded considerably over recent decades. However, data availability remains highly unbalanced across fertilizer types, with abundant measurements for conventional fertilizers and only limited reliable observations for emerging products. Transfer learning offers a potential solution by leveraging knowledge learned from well-documented conditions to improve predictions under new conditions with scarce data. In this study, we evaluated whether transfer learning can improve ammonia emission prediction when only a limited number of reliable measurements are available in a specific condition of interest. Here, fertilizer origin was used to define the prediction domains, with cattle and pig slurries considered alternately as target conditions, while trials from all other fertilizer origins constituted the corresponding source domain. The number of available high-quality micrometeorological measurements in the target domain was artificially restricted. We then assessed whether recurrent neural networks pretrained on abundant source domain data and fine-tuned on a small number of target-condition trials could accurately predict ammonia emissions in the target condition. We also investigated whether alternative ammonia measurement methods, with lower reliability, including CaractAir, wind tunnels, dynamic chambers, and calibrated passive samplers, could improve prediction performance. Under ten repetitions of five-fold cross-validation, source-domain pretraining followed by full fine-tuning yielded lower median errors than training the network directly on target trials at all target sample sizes examined. However, a target mean predictor remained competitive for cattle when few target trials were available. Adding an intermediate fine-tuning stage on alternative-method trials produced modest, domain-dependent effects: it generally improved median performance for cattle with wind tunnel, CaractAir, and dynamic chamber data, but tended to increase errors for pig. Pretraining only on CaractAir or wind tunnel trials was less effective than combining source-domain pretraining with sequential fine-tuning. These results support source-domain pretraining as a useful initialization under limited target-data availability, while showing that the additional value of alternative-method data depends on the target domain and adaptation scheme.
 bibliography: references.bib
-github-user: computorg
-repo: "template-computo-R"
-status: "submitted"
+github-user: armandfavrot
+repo: Evaluating-transfer-learning-for-ammonia-emission-prediction-under-limited-data-availability
+status: submitted
 citation:
   type: article-journal
-  container-title: "Computo"
+  container-title: Computo
   issn: "2824-7795"
-  doi: "10.5072/computo.0000" # placeholder DOI (10.5072 is the official DOI test prefix), replace once assigned
-  # set at acceptance, with the published repository name (used by Google Scholar):
-  # url: "https://computo-journal.org/published-YYYYMM-name/"
-  # pdf-url: "https://computo-journal.org/published-YYYYMM-name/main.pdf"
 license: CC-BY-4.0
+crossref:
+  custom:
+    - kind: float
+      key: suppfig
+      latex-env: suppfigure
+      reference-prefix: Figure A
+      space-before-numbering: false
+      latex-list-of-description: Supplementary Figure
 format:
   computo-html: default
-  computo-pdf: default
+  computo-pdf:
+    include-in-header:
+      text: |
+        \usepackage{caption}

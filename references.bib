@@ -1,25 +1,2000 @@
-@Preamble{ " \newcommand{\noop}[1]{} " }
 
-@Manual{R-reticulate,
-  title = {reticulate: Interface to Python},
-  author = {Kevin Ushey and JJ Allaire and Yuan Tang},
-  year = {2020},
-  note = {R package version 1.18},
-  url = {https://github.com/rstudio/reticulate},
+% ⚠️ ⚠️  à revoir abbréviation des journaux :
+% 2019 Giannakis; parnaudeau2022agro; simpson2012emep; langevin 2015; sutton2013towards; jiang2026global; ramanantenasoa2018new; fortems2020alternative; boniecki2012artificial; stamenkovic2015modeling; genedy2024physics; hurtado2024drivers; philippe2011ammonia; mohr2013belastung; erisman2008century; menegat2022greenhouse; dawar2021biochar; sommer2004ammonia; timilsena2015enhanced; riahi2017shared; robertson1999eulerian; beaudor2025evaluating; beaudor2023global; bengio2013representation; han2022semi; lecun2015deep; zhuang2020comprehensive; scotto2020review; shah2006measuring; beltran2021dataman; vigan2019development; jiang2024dynamical; jiang2025dynamical; vira2020improved; zhang2022survey
+
+% Notes -----------------------------------------------------------------------------------------------------------------------------------------------------------
+% Pour les articles, j'ai essayé d'avoir toujours (dans l'ordre) title, authors, doi, journal, volume, pages, year and publisher. Ce sont les infos requises en général par les journaux.
+% J'avais parfois l'info number (qui je crois correspond à 'Issue number') mais je l'ai supprimé pour une bonne partie des entrées, après me dire finalement que ça ne faisait pas de mal d'avoir cette info.
+% J'ai rajouté une entré 'journalfull' où je met le nom complet du journal.
+% Et dans journal, je mets le nom en abbrégés selon la norme LTWA (j'ai utilisé chatGPT pour les obtenir).
+% L'entrée 'journalfull' n'est pas très 'réglementaire' mais j'ai observé que ça ne posait pas de problème avec natbib ou biblatex, c'est tout simplement ignoré. Si bien que si j'ai besoin des noms entiers, je renomme 'journal' en 'journalshort' et 'journalfull' en 'journal'.
+% pour les sites webs, je pense que je peux utiliser le type 'misc' ou 'misc', j'ai pas encore vu la différence
+
+% proceedings, c'est une conférence, et on utilise inproceedings pour un article d'une conférence, et on a bien une entrée booktitle, mais si c'est pas vraiment un livre
+% cf par exemple Chen2016 
+
+% "To cite a chapter written by different authors inside an edited book, you must use incollection, not inbook." cf Vovk2005
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Thesis ----------------------------------------------------------------------------------------------------------------------------------------------------------
+@phdthesis{lecadre:tel-02830839,
+  TITLE = {{Mod{\'e}lisation de la volatilisation d'ammoniac apr{\`e}s fertilisation min{\'e}rale en interaction avec les processus biologiques et chimiques du sol (le mod{\`e}le VOLT'AIR)}},
+  AUTHOR = {Le Cadre, E.},
+  URL = {https://hal.inrae.fr/tel-02830839},
+  NOTE = {*UMR INRA INAPG Environnement et Grandes Cultures de Grignon Diffusion du document : UMR INRA INAPG Environnement et Grandes Cultures de Grignon Dipl{\^o}me : Dr. Ing.},
+  PAGES = {203 p.},
+  SCHOOL = {{Institut National Agronomique Paris Grignon}},
+  YEAR = {2004},
+  KEYWORDS = {these ; MODELE VOLT'AIR},
 }
 
-@article{computo,
-  title = {Computo: reproducible computational/algorithmic contributions in statistics and machine learning},
-  author = {{Computo Team}},
-  year = {2020},
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Datasets --------------------------------------------------------------------------------------------------------------------------------------------------------
+
+@dataset{decuq_2024_14170029,
+  author       = {Decuq, Celine and Génermont, Sophie},
+  title        = {DatabaseNH3 : EOM ammonia emission factor measured with INRAE Caract'Air device (under controlled conditions) },
+  month        = nov,
+  year         = 2024,
+  publisher    = {Zenodo},
+  doi          = {10.5281/zenodo.14170029},
+  url          = {https://doi.org/10.5281/zenodo.14170029},
 }
 
-@Manual{R-base,
-  title = {R: A Language and Environment for Statistical Computing},
-  author = {{R Core Team}},
-  organization = {R Foundation for Statistical Computing},
-  address = {Vienna, Austria},
-  year = {2020},
-  url = {https://www.R-project.org/},
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Websites --------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+@misc{gleizes2001emissions,
+  title={Les {\'e}missions d'ammoniac d'origine agricole dans l'atmosph{\`e}re: {\'E}tat des connaissances et perspectives de r{\'e}duction des {\'e}missions},
+  author={Gleizes, C and Aubert, Claude and Bodet, JM and B{\'e}guier, S and Cellier, Pierre and Dolle, Jean-Baptiste and G{\'e}nermont, Sophie and Guingand, Nadine and Habib, Z and Hacala, Sylvie and others},
+  year={2001},
+  publisher={Minist{\`e}re de l'Agriculture et de la P{\^e}che, Minist{\`e}re de l'Am{\'e}nagement du~…}
 }
+
+@misc{UNECE1979CLRTAP,
+  author       = {{UNECE}},
+  title        = {Convention on Long-range Transboundary Air Pollution},
+  year         = {1979},
+  address      = {Geneva, Switzerland},
+  publisher    = {United Nations},
+  url          = {https://unece.org/environmental-policy/air/convention-and-its-achievements},
+  note         = {Accessed: 2026-07-21}
+}
+
+@misc{Misselbrook2018inventorie,
+    title={Inventory of Ammonia Emissions from UK Agriculture},
+    author = {T. Misselbrook and S. L. Gilhespy},
+    url={https://uk-air.defra.gov.uk/assets/documents/reports/cat07/2103190958_UK_Agriculture_Ammonia_Emission_Report_1990-2018.pdf},
+    year={2026},
+    note={(accessed 20 july 2026)}
+}
+
+@misc{EEA2026_innventories_data,
+    title={National Emission reductions Commitments (NEC) Directive emission inventory data},
+    author={{EEA}},
+    url={https://www.eea.europa.eu/en/datahub/datahubitem-view/dcc8cc36-e670-4b05-87c4-b29385e23d85?activeAccordion=1092494},
+    year={2026},
+    note={(accessed 20 july 2026)}
+}
+
+@misc{SMED2025,
+    title={Swedish environmental emission database},
+    author={{SMED}},
+    url={https://www.smed.se/},
+    year={2025},
+    note={(accessed 24 june 2026)}
+}
+
+
+@misc{reg2019_1009,
+    title={REGULATION (EU) 2019/1009 OF THE EUROPEAN PARLIAMENT AND OF THE COUNCIL},
+    author={{European Parliament}},
+    url={https://eur-lex.europa.eu/eli/reg/2019/1009/oj/eng},
+    year={2019},
+    note={(accessed 24 june 2026)}
+}
+
+
+@misc{AAFC2025,
+    title={Residual Soil Nitrogen},
+    author={{AAFC}},
+    url={https://agriculture.canada.ca/en/environment/resource-management/indicators/residual-soil-nitrogen},
+    year={2025},
+    note={(accessed 18 june 2026)}
+}
+
+
+@misc{EEA2026airpol,
+    title={Air pollution},
+    author={{EEA}},
+    url={https://www.eea.europa.eu/en/topics/in-depth/air-pollution?},
+    year={2026},
+    note={(accessed 18 june 2026)}
+}
+
+
+@misc{hei2019,
+    title={Healt effects of particulate matter},
+    author={{Health Effects Institute}},
+    url={https://www.stateofglobalair.org/sites/default/files/soga_2019_report.pdf},
+    year={2019},
+    note={(accessed 18 june 2026)}
+}
+
+
+@misc{Directive2016,
+    title={DIRECTIVE (EU) 2016/2284 OF THE EUROPEAN PARLIAMENT AND OF THE COUNCIL},
+    author={{European Parliament}},
+    url={https://eur-lex.europa.eu/legal-content/EN/TXT/HTML/?uri=CELEX:32016L2284},
+    year={2016},
+    note={(accessed 16 june 2026)}
+}
+
+
+@misc{EEA2025,
+    title={National Emission reduction Commitments Directive},
+    author={{European Environment Agency}},
+    url={https://www.eea.europa.eu/en/topics/in-depth/air-pollution/necd},
+    year={2025},
+    note={(accessed 16 june 2026)}
+}
+
+
+@misc{EEA2017,
+    title={Air pollution from agriculture: ammonia exceeds emission limits in 2015},
+    author={{European Environment Agency}},
+    url={https://www.eea.europa.eu/highlights/air-pollution-from-agriculture-ammonia},
+    year={2017},
+    note={(accessed 22 October 2025)}
+}
+
+@misc{PREPA2022,
+    title={Plan national de réduction des émissions de polluants atmosphériques (PREPA) pour la période 2022-2025},
+    author={PREPA},
+    trueauthor={{Ministères de l'Aménagement du territoire et de la Décentralisation, des Transports, de la Ville et du Logement}},
+    url={https://www.ecologie.gouv.fr/presse/plan-national-reduction-emissions-polluants-atmospheriques-prepa-periode-2022-2025},
+    year={2022},
+    note={(accessed 16 june 2026)}
+}
+
+@misc{FREC2019,
+    title={La feuille de route économie circulaire (FREC)},
+    author={FREC},
+    url={https://www.ecologie.gouv.fr/politiques-publiques/feuille-route-economie-circulaire-frec},
+    year={2019},
+    note={(accessed 16 june 2026)}
+}
+
+
+@misc{EEA2022,
+    title={National Emission reduction Commitments Directive reporting status 2022},
+    author={{European Environment Agency}},
+    url={https://www.eea.europa.eu/publications/national-emission-reduction-commitments-directive-2022},
+    year={2022},
+    note={(accessed 20 October 2025)}
+}
+
+@misc{EEA2023AmmoniaGuidanceDocument,
+    title={EMEP/EEA air pollutant emission inventory guidebook 2023},
+    author={{EMEP/EEA}},
+    url={https://www.eea.europa.eu/en/analysis/publications/emep-eea-guidebook-2023},
+    year={2023},
+    note={(accessed 20 October 2025)}
+}
+
+
+@misc{EEA2023AmmoniaGuidanceDocument_inorganic,
+    title={EMEP/EEA air pollutant emission inventory guidebook 2023, 3.D.},
+    author={{EMEP/EEA}},
+    url={https://www.eea.europa.eu/en/analysis/publications/emep-eea-guidebook-2023/part-b-sectoral-guidance-chapters/3-agriculture/3-d-agricultural-soils-2023/@@download/file},
+    year={2023},
+    note={(accessed 25 july 2026)}
+}
+
+
+@misc{EEA2024,
+    title={Air pollution in Europe: 2024 reporting status under the National Emission reduction Commitments Directive},
+    author={{European Environment Agency}},
+    url={https://www.eea.europa.eu/en/analysis/publications/national-emission-reduction-commitments-directive-2024},
+    year={2024},
+    note={(accessed 20 October 2025)}
+}
+
+@misc{EC2023,
+    title={Glossary:Type of manure application},
+    author={Eurostat},
+    url={https://ec.europa.eu/eurostat/statistics-explained/index.php?title=Glossary:Type_of_manure_application},
+    year={2023}
+}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Conferences -----------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+@inproceedings{blitzer2006domain,
+  title={Domain adaptation with structural correspondence learning},
+  author={Blitzer, John and McDonald, Ryan and Pereira, Fernando},
+  booktitle={Proceedings of the 2006 conference on empirical methods in natural language processing},
+  pages={120--128},
+  year={2006}
+}
+
+@inproceedings{genermont:hal-03949824,
+  TITLE = {{Potentiels de volatilisation d'ammoniac au champ de divers substrats : mesures en conditions contr{\^o}l{\'e}es et analyse des d{\'e}terminismes}},
+  AUTHOR = {G{\'e}nermont, Sophie and Esnault, Baptiste and D{\'e}cuq, C{\'e}line},
+  URL = {https://hal.inrae.fr/hal-03949824},
+  BOOKTITLE = {{15{\`e}mes Rencontres de la fertilisation raisonn{\'e}e et de l'analyse - Comifer-Gemas}},
+  ADDRESS = {Clermont-Ferrand, France},
+  YEAR = {2021},
+  MONTH = Nov,
+  KEYWORDS = {Volatilisation d'ammoniac ; Conditions contr{\^o}l{\'e}es ; Engrais azot{\'e}s ; Produits r{\'e}siduaires organiques ; Facteurs d'{\'e}mission},
+  PDF = {https://hal.inrae.fr/hal-03949824v1/file/R21-RESUME-GENERMONT-Potentiel_Ammoniac.pdf},
+  HAL_ID = {hal-03949824},
+  HAL_VERSION = {v1},
+}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Chapter in books ------------------------------------------------------------------------------------------------------------------------------------------------
+
+@incollection{awika2011major,
+  title={Major cereal grains production and use around the world},
+  author={Awika, Joseph M},
+  booktitle={Advances in cereal science: implications to food processing and health promotion},
+  pages={1--13},
+  year={2011},
+  publisher={ACS Publications}
+}
+
+@inproceedings{krizhevsky2012imagenet,
+    booktitle={Advances in Neural Information Processing Systems},
+    title={ImageNet Classification with Deep Convolutional Neural Networks},
+    author={Krizhevsky, Alex and Sutskever, Ilya and Hinton, Geoffrey E},
+    editor={F. Pereira and C.J. Burges and L. Bottou and K.Q. Weinberger},
+    pages={},
+    publisher={Curran Associates, Inc.},
+    url={https://proceedings.neurips.cc/paper_files/paper/2012/file/c399862d3b9d6b76c8436e924a68c45b-Paper.pdf},
+    volume={25},
+    year={2012}
+}
+
+@book{sutton2011european,
+  title={The European nitrogen assessment: sources, effects and policy perspectives},
+  author={Sutton, Mark A and Howard, Clare M and Erisman, Jan Willem and Billen, Gilles and Bleeker, Albert and Grennfelt, Peringe and Van Grinsven, Hans and Grizzetti, Bruna},
+  year={2011},
+  publisher={Cambridge university press}
+}
+
+@inbook{moldanova2011,
+    booktitle={The European Nitrogen Assessment: Sources, Effects and Policy Perspectives},
+    title={Nitrogen as a threat to European air quality},
+    author={Moldanova, Jana and Grennfelt, Peringe and Jonsson, Åsa and Simpson, David and Spranger, T. and Aas, Wenche and Munthe, John and Rabl, Ari},
+    doi={https://doi.org/10.1017/CBO9780511976988.021},
+    year={2011},
+    month={04},
+    pages={405-433},
+    isbn={978-1-107-00612-6},
+    publisher={Cambridge University Press}
+}
+
+@inbook{Goodfellow2016,
+    title={Deep Learning},
+    author={Ian Goodfellow and Yoshua Bengio and Aaron Courville},
+    publisher={MIT Press},
+    note={\url{http://www.deeplearningbook.org}},
+    year={2016}
+}
+
+@inbook{shapley1953value,
+    booktitle={Classics in Game Theory},
+    title={A Value for n-Person Games},
+    author={L. Shapley},
+    editor={Harold William Kuhn},
+    publisher={Princeton University Press},
+    address={Princeton},
+    pages={69--79},
+    doi={https://doi.org/10.1515/9781400829156-012},
+    isbn={9781400829156},
+    year={1953},
+    url={https://doi.org/10.1515/9781400829156-012},
+}
+
+@book{sutton2013ournutrientworld,
+  title={Our nutrient world: the challenge to produce more food and energy with less pollution},
+  author={Sutton, Mark A and Bleeker, Albert and Howard, Clare M and Bekunda, M and Grizzetti, B and de Vries, Wim and Van Grinsven, HJM and Abrol, YP and Adhya, TK and Billen, G and others},
+  year={2013},
+  publisher={NERC/Centre for Ecology \& Hydrology}
+}
+
+@book{bedos2020agriculture,
+  title={Agriculture and air quality: investigating, assessing and managing},
+  author={Bedos, Carole and G{\'e}nermont, Sophie and Castell, Jean-Fran{\c{c}}ois and Cellier, Pierre},
+  year={2020},
+  publisher={Springer}
+}
+
+@incollection{Vovk2005,
+    bookTitle={Algorithmic Learning in a Random World},
+    title={On-line compression modeling I: conformal prediction},
+    author={Vovk, Vladimir and Gammerman, Alexander and Shafer, Glenn},
+    editor={Vovk, Vladimir and Gammerman, Alexander and Shafer, Glenn},
+    publisher={Springer US},
+    address={Boston, MA},
+    pages={189-221},
+    isbn={978-0-387-25061-8},
+    doi={https://doi.org/10.1007/0-387-25061-1_8},
+    year={2005}
+}
+
+
+@incollection{loubet2021measuring,
+  title={Measuring air pollutant concentrations and fluxes},
+  author={Loubet, Benjamin and Baisn{\'e}e, Dominique and Cazaunau, Mathieu and Fortems-Cheiney, Audrey and Ciuraru, Raluca and Clerbaux, Cathy and Doussin, Jean-Fran{\c{c}}ois and Dufour, Ga{\"e}lle and Focsa, Cristian and George, Christian and others},
+  doi={https://doi.org/10.1007/978-94-024-2058-6_6},
+  booktitle={Agriculture and Air Quality: Investigating, Assessing and Managing},
+  pages={119--157},
+  year={2021},
+  publisher={Springer}
+}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Reports ---------------------------------------------------------------------------------------------------------------------------------------------------------
+
+@techreport{foen2026,
+    title = {Switzerland’s Informative Inventory Report 2026 (IIR)},
+    author={{FOEN}},
+    url={https://www.bafu.admin.ch/dam/de/sd-web/no4UrMC-9s7A/IIR-CHE-2026.pdf},
+    year={2026},
+    note={(accessed 25 july 2026)}
+}
+
+@techreport{guthrie2018impact,
+    title={The impact of ammonia emissions from agriculture on biodiversity},
+    author={Guthrie, Susan and Giles, Sarah and Dunkerley, Fay and Tabaqchali, Hadeel and Harshfield, Amelia and Ioppolo, Becky and Manville, Catriona},
+    doi={https://doi.org/10.7249/RR2695},
+    institution={RAND Europe and The Royal Society},
+    year={2018}
+}
+
+@techreport{sommer1991effects,
+    title={Effects of dry matter content and temperature on ammonia loss from surface-applied cattle slurry},
+    author={Sommer, Sven Gjedde and Olesen, J{\o}rgen E},
+    doi={https://doi.org/10.2134/jeq1991.00472425002000030029x},
+    journalfull={Journal of Environmental Quality},
+    journal={J. Environ. Qual.},
+    volume={20},
+    number={3},
+    pages={679-683},
+    year={1991},
+    publisher={Wiley Online Library}
+}
+
+@article{huygens2019technical,
+  title={Technical proposals for selected new fertilising materials under the Fertilising Products Regulation (Regulation (EU) 2019/1009)},
+  author={Huygens, Dries and SAVEYN, Hans and TONINI, Davide and EDER, Peter and DELGADO, SANCHO Luis and others},
+  doi={https://doi.org/10.2760/186684},
+  year={2019}
+}
+
+@techreport{SEPA2021,
+  author      = {SEPA},
+  title       = {Informative Inventory Report Sweden 2021},
+  institution = {Swedish Environmental Protection Agency},
+  year        = {2021},
+  address     = {Stockholm, Sweden}
+}
+
+@techreport{hellsten2017ammonia,
+  author      = {Hellsten, Sofie},
+  title       = {Ammonia Abatement in Sweden: Inventories, Projections and Potential for Reduction},
+  institution = {IVL Swedish Environmental Research Institute},
+  year        = {2017},
+  address     = {Stockholm, Sweden},
+  url         = {https://www.diva-portal.org/smash/get/diva2:1549686/FULLTEXT01.pdf}
+}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% arXiv articles --------------------------------------------------------------------------------------------------------------------------------------------------
+
+@article{wen2020time,
+    title={Time series data augmentation for deep learning: A survey},
+    author={Wen, Qingsong and Sun, Liang and Yang, Fan and Song, Xiaomin and Gao, Jingkun and Wang, Xue and Xu, Huan},
+    journalfull={arXiv preprint arXiv:2002.12478},
+    journal={arXiv preprint arXiv:2002.12478},
+    year={2020}
+}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Packages --------------------------------------------------------------------------------------------------------------------------------------------------------
+
+@article{Liaw2002,
+    title={Classification and Regression by randomForest},
+    author={Andy Liaw and Matthew Wiener},
+    journalfull={R News},
+    journal={R News},
+    volume={2},
+    pages={18-22},
+    year={2002}
+}
+
+@Manual{treeshap,
+    title={treeshap: Compute SHAP Values for Your Tree-Based Models Using the
+'TreeSHAP' Algorithm},
+    author={Konrad Komisarczyk and Pawel Kozminski and Szymon Maksymiuk and Przemyslaw Biecek},
+    year={2024},
+    note={R package version 0.3.1},
+    url={https://CRAN.R-project.org/package=treeshap},
+  }
+
+@misc{xgboostdoc2022,
+    author={XGBoost/Documentation},
+    title={Understanding your dataset with XGBoost},
+    url={https://xgboost.readthedocs.io/en/release_2.0.0/R-package/discoverYourData.html},
+    year={2022}
+}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Articles --------------------------------------------------------------------------------------------------------------------------------------------------------
+
+@article{beutier1978representation,
+  title={Representation of NH3-H2S-H2O, NH3-CO2-H2O, and NH3-SO2-H2O Vapor-Liquid Equilibria},
+  author={Beutier, Didier and Renon, Henri},
+  doi={https://doi.org/10.1021/i260067a002},
+  journal={Industrial \& Engineering Chemistry Process Design and Development},
+  volume={17},
+  number={3},
+  pages={220--230},
+  year={1978},
+  publisher={ACS Publications}
+}
+
+@article{rachhpal1986,
+  author = {Rachhpal-Singh and Nye, P. H.},
+  title = {A model of ammonia volatilization from applied urea. I. Development of the model},
+  journal = {Journal of Soil Science},
+  volume = {37},
+  number = {1},
+  pages = {9-20},
+  doi = {https://doi.org/10.1111/j.1365-2389.1986.tb00002.x},
+  year = {1986}
+}
+
+
+@article{rumelhart1986learning,
+    title={Learning representations by back-propagating errors},
+    author={Rumelhart, David E and Hinton, Geoffrey E and Williams, Ronald J},
+    doi={https://doi.org/10.1038/323533a0},
+    journalfull={Nature},
+    journal={Nature},
+    volume={323},
+    number={6088},
+    pages={533-536},
+    year={1986},
+    publisher={Nature Publishing Group UK London}
+}
+
+@article{elman1990finding,
+    title={Finding structure in time},
+    author={Elman, Jeffrey L},
+    doi={https://doi.org/10.1207/s15516709cog1402_1},
+    journalfull={Cognitive science},
+    journal={Cogn. Sci.},
+    volume={14},
+    pages={179-211},
+    year={1990},
+    publisher={Wiley Online Library}
+}
+
+@article{van1990ammonia,
+  title={Ammonia volatilization from arable land after application of cattle slurry. 2. Derivation of a transfer model.},
+  author={Van der Molen, J and Beljaars, ACM and Chardon, WJ and Jury, WA and Van Faassen, HG},
+  doi={https://doi.org/10.18174/njas.v38i3A.16586}, 
+  journal={Netherlands journal of agricultural science},
+  volume={38},
+  number={3A},
+  pages={239--254},
+  year={1990}
+}
+
+@article{jayaweera1991assessment,
+  title={Assessment of ammonia volatilization from flooded soil systems},
+  author={Jayaweera, Gamani R and Mikkelsen, Duane S},
+  doi={https://doi.org/10.1016/S0065-2113(08)60044-9},
+  journal={Advances in agronomy},
+  volume={45},
+  pages={303--356},
+  year={1991},
+  publisher={Elsevier}
+}
+
+@article{li1992model,
+  title={A model of nitrous oxide evolution from soil driven by rainfall events: 1. Model structure and sensitivity},
+  author={Li, Changsheng and Frolking, Steve and Frolking, Tod A},
+  doi={https://doi.org/10.1029/92JD00509},
+  journal={Journal of Geophysical Research: Atmospheres},
+  volume={97},
+  number={D9},
+  pages={9759--9776},
+  year={1992},
+  publisher={Wiley Online Library}
+}
+
+@article{fangmeier1994effects,
+  title={Effects of atmospheric ammonia on vegetation—a review},
+  author={Fangmeier, Andreas and Hadwiger-Fangmeier, Angelika and Van der Eerden, Ludger and J{\"a}ger, Hans-J{\"u}rgen},
+  doi={https://doi.org/10.1016/0269-7491(94)90008-6},
+  journal={Environmental pollution},
+  volume={86},
+  number={1},
+  pages={43--82},
+  year={1994},
+  publisher={Elsevier}
+}
+
+@article{sommer1995simple,
+    title={A simple model of pH in slurry},
+    author={Sommer, Sven Gjedde and Husted, S},
+    doi={https://doi.org/10.1017/S0021859600073408},
+    journalfull={The Journal of agricultural science},
+    journal={J. Agric. Sci.},
+    volume={124},
+    number={3},
+    pages={447-453},
+    year={1995},
+    publisher={Cambridge University Press}
+}
+
+@article{tibshirani1996regression,
+    title={Regression shrinkage and selection via the lasso},
+    author={Tibshirani, Robert},
+    doi={https://doi.org/10.1111/j.2517-6161.1996.tb02080.x},
+    journalfull={Journal of the Royal Statistical Society Series B: Statistical Methodology},
+    journal={J. R. Stat. Soc., B: Stat. Methodol.},
+    volume={58},
+    number={1},
+    pages={267-288},
+    year={1996},
+    publisher={Oxford University Press}
+}
+
+@article{braschkat1997estimation,
+    title={Estimation of ammonia losses after application of liquid cattle manure on grassland},
+    author={Braschkat, Jörg and Mannheim, Thomas and Marschner, Horst},
+    doi={https://doi.org/10.1002/jpln.19971600202},
+    journalfull={Zeitschrift für Pflanzenernährung und Bodenkunde},
+    journal={Z. Pflanzenernähr. Bodenkd.},
+    volume={160},
+    pages={117-123},
+    year={1997},
+    publisher={Wiley Online Library}
+}
+
+@article{genermont1997mechanistic,
+    title={A mechanistic model for estimating ammonia volatilization from slurry applied to bare soil},
+    author={Génermont, Sophie and Cellier, Pierre},
+    doi={https://doi.org/10.1016/S0168-1923(97)00044-0},
+    journalfull={Agricultural and Forest Meteorology},
+    journal={Agric. For. Meteorol.},
+    volume={88},
+    pages={145-167},
+    year={1997},
+    publisher={Elsevier}
+}
+
+@article{hochreiter1997long,
+    title={Long short-term memory},
+    author={Hochreiter, Sepp and Schmidhuber, Jürgen},
+    doi={https://doi.org/10.1162/neco.1997.9.8.1735},
+    journalfull={Neural computation},
+    journal={Neural Comput.},
+    volume={9},
+    pages={1735-1780},
+    year={1997},
+    publisher={MIT press}
+}
+
+@article{menzi1998simple,
+    title={A simple empirical model based on regression analysis to estimate ammonia emissions after manure application},
+    author={Menzi, H and Katz, PE and Fahrni, M and Neftel, A and Frick, R},
+    doi={https://doi.org/10.1016/S1352-2310(97)00239-2},
+    journalfull={Atmospheric Environment},
+    journal={Atmos. Environ.},
+    volume={32},
+    number={3},
+    pages={301-307},
+    year={1998},
+    publisher={Elsevier}
+}
+
+@article{robertson1999eulerian,
+  title={An Eulerian limited-area atmospheric transport model},
+  author={Robertson, Lennart and Langner, Joakim and Engardt, Magnuz},
+  doi={https://doi.org/10.1175/1520-0450(1999)038<0190:AELAAT>2.0.CO;2},
+  journal={Journal of Applied Meteorology},
+  volume={38},
+  number={2},
+  pages={190--210},
+  year={1999}
+}
+
+@article{sommer2000modelling,
+    title={Modelling ammonia volatilization from animal slurry applied with trail hoses to cereals},
+    author={Sommer, Sven Gjedde and Olesen, J{\o}rgen E},
+    doi={https://doi.org/10.1016/S1352-2310(99)00442-2},
+    journalfull={Atmospheric Environment},
+    journal={Atmos. Environ.},
+    volume={34},
+    number={15},
+    pages={2361-2372},
+    year={2000},
+    publisher={Elsevier}
+}
+
+@article{breiman2001random,
+    title={Random forests},
+    author={Breiman, Leo},
+    doi={https://doi.org/10.1023/A:1010950718922},
+    journalfull={Machine learning},
+    journal={Mach. Learn.},
+    volume={45},
+    pages={5-32},
+    year={2001},
+    publisher={Springer}
+}
+
+@article{friedman2001greedy,
+    title={Greedy Function Approximation: A Gradient Boosting Machine},
+    author={Jerome H. Friedman},
+    doi={https://doi.org/10.1214/aos/1013203451},
+    journalfull={The Annals of Statistics},
+    journal={Ann. Stat.},
+    volume={29},
+    number={5},
+    pages={1189--1232},
+    year={2001},
+    publisher={Institute of Mathematical Statistics},
+}
+
+@article{plochl2001neural,
+    title={Neural network approach for modelling ammonia emission after manure application on the field},
+    author={Plöchl, Matthias},
+    doi={https://doi.org/10.1016/S1352-2310(01)00281-3},
+    journalfull={Atmospheric Environment},
+    journal={Atmos. Environ.},
+    volume={35},
+    number={33},
+    pages={5833-5841},
+    year={2001},
+    publisher={Elsevier}
+}
+
+@article{chelani2002prediction,
+    title={Prediction of sulphur dioxide concentration using artificial neural networks},
+    author={Chelani, Asha B and Rao, CV Chalapati and Phadke, KM and Hasan, MZ},
+    doi={https://doi.org/10.1016/S1364-8152(01)00061-5},
+    journalfull={Environmental Modelling and Software},
+    journal={Environ. Model. Softw.},
+    volume={17},
+    pages={159-166},
+    year={2002},
+    publisher={Elsevier}
+}
+
+@article{sogaard2002ammonia,
+    title={Ammonia volatilization from field-applied animal slurry—the ALFAM model},
+    author={H.T Søgaard and S.G Sommer and N.J Hutchings and J.F.M Huijsmans and D.W Bussink and F Nicholson},
+    doi={https://doi.org/10.1016/S1352-2310(02)00300-X},
+    journalfull={Atmospheric Environment},
+    journal={Atmos. Environ.},
+    volume={36},
+    number={20},
+    pages={3309-3319},
+    year={2002},
+    publisher={Elsevier}
+}
+
+@article{brisson2003overview,
+    title={An overview of the crop model STICS},
+    author={N Brisson and C Gary and E Justes and R Roche and B Mary and D Ripoche and D Zimmer and J Sierra and P Bertuzzi and P Burger and F Bussière and Y.M Cabidoche and P Cellier and P Debaeke and J.P Gaudillère and C Hénault and F Maraux and B Seguin and H Sinoquet},
+    doi={https://doi.org/10.1016/S1161-0301(02)00110-7},
+    journalfull={European Journal of agronomy},
+    journal={Eur. J. Agron.},
+    volume={18},
+    pages={309-332},
+    year={2003},
+    publisher={Elsevier}
+}
+
+@article{krupa2003effects,
+    title={Effects of atmospheric ammonia (NH3) on terrestrial vegetation: a review},
+    author={Krupa, SV},
+    doi={https://doi.org/10.1016/S0269-7491(02)00434-7},
+    journalfull={Environmental pollution},
+    journal={Environ. Pollut.},
+    volume={124},
+    pages={179-221},
+    year={2003},
+    publisher={Elsevier}
+}
+
+@article{sommer2003processes,
+    title={Processes controlling ammonia emission from livestock slurry in the field},
+    author={Sommer, Sven Gjedde and G{\'e}nermont, Sophie and Cellier, Pierre and Hutchings, NJ and Olesen, J{\o}rgen E and Morvan, T},
+    doi={https://doi.org/10.1016/S1161-0301(03)00037-6},
+    journalfull={European Journal of Agronomy},
+    journal={Eur. J. Agron.},
+    volume={19},
+    number={4},
+    pages={465-486},
+    year={2003},
+    publisher={Elsevier}
+}
+
+@article{wu2003modeling,
+  title={Modeling ammonia volatilization from surface-applied swine effluent},
+  author={Wu, J and Nofziger, DL and Warren, JG and Hattey, JA},
+  doi={https://doi.org/10.2136/sssaj2003.1000a},
+  journal={Soil Science Society of America Journal},
+  volume={67},
+  number={1},
+  pages={1--11},
+  year={2003},
+  publisher={Wiley Online Library}
+}
+
+@article{erisman2004need,
+    title={The need for ammonia abatement with respect to secondary PM reductions in Europe},
+    author={Erisman, JW and Schaap, M},
+    doi={https://doi.org/10.1016/j.envpol.2003.08.042},
+    journalfull={Environmental Pollution},
+    journal={Environ. Pollut.},
+    volume={129},
+    number={1},
+    pages={159-163},
+    year={2004},
+    publisher={Elsevier}
+}
+
+
+@article{sommer2004ammonia,
+  title={Ammonia emission from mineral fertilizers and fertilized crops},
+  author={Sommer, Sven G and Schjoerring, Jan K and Denmead, OT},
+  doi={https://doi.org/10.1016/S0065-2113(03)82008-4},
+  journal={Advances in agronomy},
+  volume={82},
+  number={557622},
+  pages={82008--82004},
+  year={2004},
+  publisher={New York: Academic Press, 1949-}
+}
+
+@article{misselbrook2005predicting,
+    title={Predicting ammonia losses following the application of livestock manure to land},
+    author={Misselbrook, TH and Nicholson, FA and Chambers, BJ},
+    doi={https://doi.org/10.1016/j.biortech.2004.05.004},
+    journalfull={Bioresource Technology},
+    journal={Bioresour. Technol.},
+    volume={96},
+    number={2},
+    pages={159-168},
+    year={2005},
+    publisher={Elsevier}
+}
+
+
+@article{pacholski2006calibration,
+  title={Calibration of a simple method for determining ammonia volatilization in the field--comparative measurements in Henan Province, China},
+  author={Pacholski, Andreas and Cai, Guixin and Nieder, Rolf and Richter, J{\"o}rg and Fan, Xiaohui and Zhu, Zhaoliang and Roelcke, Marco},
+  doi={https://doi.org/10.1007/s10705-006-9003-4},
+  journal={Nutrient Cycling in Agroecosystems},
+  volume={74},
+  number={3},
+  pages={259--273},
+  year={2006},
+  publisher={Springer}
+}
+
+
+@article{shah2006measuring,
+  title={Measuring ammonia concentrations and emissions from agricultural land and liquid surfaces: a review},
+  author={Shah, Sanjay B and Westerman, Philip W and Arogo, Jactone},
+  doi={https://doi.org/10.1080/10473289.2006.10464512},
+  journal={Journal of the Air \& Waste Management Association},
+  volume={56},
+  number={7},
+  pages={945--960},
+  year={2006},
+  publisher={Taylor \& Francis}
+}
+
+@article{lim2007artificial,
+    title={Artificial neural network approach for prediction of ammonia emission from field-applied manure and relative significance assessment of ammonia emission factors},
+    author={Lim, Youngil and Moon, Young-Sil and Kim, Tae-Wan},
+    doi={https://doi.org/10.1016/j.eja.2007.01.008},
+    journalfull={European journal of agronomy},
+    journal={Eur. J. Agron.},
+    volume={26},
+    number={4},
+    pages={425-434},
+    year={2007},
+    publisher={Elsevier}
+}
+
+@article{beusen2008bottom,
+    title={Bottom-up uncertainty estimates of global ammonia emissions from global agricultural production systems},
+    author={Beusen, AHW and Bouwman, AF and Heuberger, PSC and Van Drecht, G and Van Der Hoek, KW},
+    doi={https://doi.org/10.1016/j.atmosenv.2008.03.044},
+    journalfull={Atmospheric environment},
+    journal={Atmos. Environ.},
+    volume={42},
+    pages={6067-6077},
+    year={2008},
+    publisher={Elsevier}
+}
+
+@article{erisman2008century,
+  title={How a century of ammonia synthesis changed the world},
+  author={Erisman, Jan Willem and Sutton, Mark A and Galloway, James and Klimont, Zbigniew and Winiwarter, Wilfried},
+  doi={https://doi.org/10.1038/ngeo325},
+  journal={Nature geoscience},
+  volume={1},
+  number={10},
+  pages={636--639},
+  year={2008},
+  publisher={Nature Publishing Group UK London}
+}
+
+@article{pan2009survey,
+    title={A survey on transfer learning},
+    author={Pan, Sinno Jialin and Yang, Qiang},
+    doi={https://doi.org/10.1109/TKDE.2009.191},
+    journalfull={IEEE Transactions on knowledge and data engineering},
+    journal={IEEE Trans. Knowl. Data Eng.},
+    volume={22},
+    number={10},
+    pages={1345-1359},
+    year={2009},
+    publisher={IEEE}
+}
+
+@article{brook2010particulate,
+    title={Particulate matter air pollution and cardiovascular disease: an update to the scientific statement from the American Heart Association},
+    author={Robert D. Brook  and Sanjay Rajagopalan  and C. Arden Pope  and Jeffrey R. Brook  and Aruni Bhatnagar  and Ana V. Diez-Roux  and Fernando Holguin  and Yuling Hong  and Russell V. Luepker  and Murray A. Mittleman  and Annette Peters  and David Siscovick  and Sidney C. Smith  and Laurie Whitsel  and Joel D. Kaufman},
+    doi={https://doi.org/10.1161/CIR.0b013e3181dbece1},
+    journalfull={Circulation},
+    journal={Circulation},
+    volume={121},
+    pages={2331-2378},
+    year={2010},
+    publisher={Am Heart Assoc}
+}
+
+@Article{Friedman2010,
+    title={Regularization Paths for Generalized Linear Models via
+      Coordinate Descent},
+    author={Jerome Friedman and Robert Tibshirani and Trevor Hastie},
+    doi={https://doi.org/10.1163/ej.9789004178922.i-328.7},
+    journalfull={Journal of Statistical Software},
+    journal={J. Stat. Softw.},
+    year={2010},
+    volume={33},
+    number={1},
+    pages={1-22},
+}
+
+@article{webb2010impacts,
+    title={The impacts of manure application methods on emissions of ammonia, nitrous oxide and on crop response—A review},
+    author={Webb, J and Pain, Brian and Bittman, Shabtai and Morgan, John},
+    doi={https://doi.org/10.1016/j.agee.2010.01.001},
+    journalfull={Agriculture, Ecosystems and Environment},
+    journal={Agric. Ecosyst. Environ.},
+    volume={137},
+    number={1-2},
+    pages={39-46},
+    year={2010},
+    publisher={Elsevier}
+}
+
+@article{philippe2011ammonia,
+  title={Ammonia emissions from pig houses: Influencing factors and mitigation techniques},
+  author={Philippe, Fran{\c{c}}ois-Xavier and Cabaraux, Jean-Fran{\c{c}}ois and Nicks, Baudouin},
+  doi={https://doi.org/10.1016/j.agee.2011.03.012},
+  journal={Agriculture, ecosystems \& environment},
+  volume={141},
+  number={3-4},
+  pages={245--260},
+  year={2011},
+  publisher={Elsevier}
+}
+
+@article{vogeler2011pedotransfer,
+  title={Pedotransfer functions for estimating ammonium adsorption in soils},
+  author={Vogeler, I and Cichota, R and Snow, VO and Dutton, T and Daly, B},
+  doi={https://doi.org/10.2136/sssaj2010.0192},
+  journal={Soil Science Society of America Journal},
+  volume={75},
+  number={1},
+  pages={324--331},
+  year={2011},
+  publisher={Wiley Online Library}
+}
+
+@article{boniecki2012artificial,
+  title={Artificial neural networks for modeling ammonia emissions released from sewage sludge composting},
+  author={Boniecki, P and Dach, J and Pilarski, K and Piekarska-Boniecka, H},
+  doi={https://doi.org/10.1016/j.atmosenv.2012.04.036},
+  journal={Atmospheric Environment},
+  volume={57},
+  pages={49--54},
+  year={2012},
+  publisher={Elsevier}
+}
+
+@article{garcia2012accounting,
+  title={Accounting for surface cattle slurry in ammonia volatilization models: the case of Volt'Air},
+  author={Garcia, Lucas and G{\'e}nermont, Sophie and Bedos, Carole and Simon, Nadler Nahindy and Garnier, Patricia and Loubet, Benjamin and Cellier, Pierre},
+  doi={https://doi.org/10.2136/sssaj2012.0067},
+  journal={Soil Science Society of America Journal},
+  volume={76},
+  number={6},
+  pages={2184--2194},
+  year={2012},
+  publisher={Wiley Online Library}
+}
+
+@article{gericke2012modelling,
+    title={Modelling ammonia losses after field application of biogas slurry in energy crop rotations},
+    author={Gericke, Dirk and Bornemann, Lüder and Kage, Henning and Pacholski, Andreas},
+    doi={https://doi.org/10.1007/s11270-011-0835-4},
+    journalfull={Water, Air, and Soil Pollution},
+    journal={Water Air Soil Pollut.},
+    volume={223},
+    pages={29-47},
+    year={2012},
+    publisher={Springer}
+}
+
+@article{ni2012analysis,
+  title={Analysis of ammonia losses after field application of biogas slurries by an empirical model},
+  author={Ni, Kang and Pacholski, Andreas and Gericke, Dirk and Kage, Henning},
+  doi={ https://doi.org/10.1002/jpln.201000358},
+  journal={Journal of Plant Nutrition and Soil Science},
+  volume={175},
+  number={2},
+  pages={253--264},
+  year={2012},
+  publisher={Wiley Online Library}
+}
+
+@article{parnaudeau2012outil,
+  title={Un outil d'{\'e}valuation des fuites d'azote vers l'environnement {\`a} l'{\'e}chelle du syst{\`e}me de culture: le logiciel Syst'N},
+  author={Parnaudeau, Virginie V and Reau, Raymond R and Dubrulle, Pascal P},
+  doi={https://doi.org/10.17180/e8c4-c438},
+  journal={Innovations agronomiques},
+  volume={21},
+  pages={59--70},
+  year={2012}
+}
+
+@article{simpson2012emep,
+  title={The EMEP MSC-W chemical transport model--technical description},
+  author={Simpson, David and Benedictow, Anna and Berge, Haldis and Bergstr{\"o}m, Robert and Emberson, Lisa D and Fagerli, Hilde and Flechard, Chris R and Hayman, Garry D and Gauss, Michael and Jonson, Jan Eiof and others},
+  doi={https://doi.org/10.5194/acp-12-7825-2012},
+  journal={Atmospheric Chemistry and Physics},
+  volume={12},
+  number={16},
+  pages={7825--7865},
+  year={2012},
+  publisher={Copernicus Publications G{\"o}ttingen, Germany}
+}
+
+@article{behera2013ammonia,
+    title={Ammonia in the atmosphere: a review on emission sources, atmospheric chemistry and deposition on terrestrial bodies},
+    author={Behera, Sailesh N and Sharma, Mukesh and Aneja, Viney P and Balasubramanian, Rajasekhar},
+    doi={https://doi.org/10.1007/s11356-013-2051-9},
+    journalfull={Environmental Science and Pollution Research},
+    journal={Environ. Sci. Pollut. Res.},
+    volume={20},
+    pages={8092-8131},
+    year={2013},
+    publisher={Springer}
+}
+
+@article{bengio2013representation,
+  title={Representation learning: A review and new perspectives},
+  author={Bengio, Yoshua and Courville, Aaron and Vincent, Pascal},
+  doi={https://doi.org/10.1109/TPAMI.2013.50},
+  journal={IEEE transactions on pattern analysis and machine intelligence},
+  volume={35},
+  number={8},
+  pages={1798--1828},
+  year={2013},
+  publisher={IEEE}
+}
+
+@article{cuddington2013process,
+  title={Process-based models are required to manage ecological systems in a changing world},
+  author={Cuddington, K and Fortin, M-J and Gerber, LR and Hastings, Alan and Liebhold, A and O'connor, M and Ray, C},
+  doi={https://doi.org/10.1890/ES12-00178.1},
+  journal={Ecosphere},
+  volume={4},
+  number={2},
+  pages={1--12},
+  year={2013},
+  publisher={Wiley Online Library}
+}
+
+@article{heffer2013assessment,
+  title={Assessment of fertilizer use by crop at the global level},
+  author={Heffer, Patrick and Gru{\`e}re, Armelle and Roberts, Terry and others},
+  journal={International Fertilizer Industry Association, Paris},
+  year={2013}
+}
+
+@article{mohr2013belastung,
+  title={Belastung von W{\"a}ldern in Nordwest-Niedersachsen durch Ammoniak und Ammonium in der Umgebung von Tierhaltungsanlagen: Teil 2, Wirkungen auf B{\"o}den und Vegetation},
+  author={Mohr, Karsten and D{\"a}mmgen, Ulrich},
+  journal={Applied agricultural and forestry research},
+  volume={63},
+  pages={129--142},
+  year={2013}
+}
+
+@article{sutton2013towards,
+  title={Towards a climate-dependent paradigm of ammonia emission and deposition},
+  author={Sutton, Mark A and Reis, Stefan and Riddick, Stuart N and Dragosits, Ulrike and Nemitz, Eiko and Theobald, Mark R and Tang, Y Sim and Braban, Christine F and Vieno, Massimo and Dore, Anthony J and others},
+  doi={https://doi.org/10.1098/rstb.2013.0166},
+  journal={Philosophical Transactions of the Royal Society B: Biological Sciences},
+  volume={368},
+  number={1621},
+  pages={20130166},
+  year={2013}
+}
+
+@article{world2013health,
+  title={Health effects of particulate matter: policy implications for countries in eastern Europe, Caucasus and central Asia},
+  author={WHO},
+  year={2013},
+  publisher={World Health Organization. Regional Office for Europe}
+}
+
+@article{hauglustaine2014global,
+  title={A global model simulation of present and future nitrate aerosols and their direct radiative forcing of climate},
+  author={Hauglustaine, Didier A and Balkanski, Yves and Schulz, Michael},
+  doi={https://doi.org/10.5194/acp-14-11031-2014},
+  journal={Atmospheric Chemistry and Physics},
+  volume={14},
+  number={20},
+  pages={11031--11063},
+  year={2014},
+  publisher={Copernicus Publications G{\"o}ttingen, Germany}
+}
+
+
+@article{fangueiro2015acidification,
+  title={Acidification of animal slurry--a review},
+  author={Fangueiro, David and Hjorth, Maibritt and Gioelli, Fabrizio},
+  doi={https://doi.org/10.1016/j.jenvman.2014.10.001},
+  journal={Journal of environmental management},
+  volume={149},
+  pages={46--56},
+  year={2015},
+  publisher={Elsevier}
+}
+
+@article{langevin2015simulation,
+  title={Simulation of field NH3 and N2O emissions from slurry spreading: B. Langevin et al.},
+  author={Langevin, Brigitte and G{\'e}nermont, Sophie and Basset-Mens, Claudine and Lardon, Laurent},
+  doi={https://doi.org/10.1007/s13593-014-0248-z},
+  journal={Agronomy for sustainable development},
+  volume={35},
+  number={1},
+  pages={347--358},
+  year={2015},
+  publisher={Springer}
+}
+
+
+@article{lecun2015deep,
+  title={Deep learning},
+  author={LeCun, Yann and Bengio, Yoshua and Hinton, Geoffrey},
+  doi={https://doi.org/10.1038/nature14539},
+  journal={nature},
+  volume={521},
+  number={7553},
+  pages={436--444},
+  year={2015},
+  publisher={Nature Publishing Group UK London}
+}
+
+@article{miola2015static,
+  title={Static chamber measurements of ammonia volatilization from manured soils: impact of deployment duration and manure characteristics},
+  author={Miola, Ezequiel CC and Aita, Celso and Rochette, Philippe and Chantigny, Martin H and Angers, Denis A and Bertrand, Normand and Gasser, Marc-Olivier},
+  doi={https://doi.org/10.2136/sssaj2014.07.0305},
+  journal={Soil Science Society of America Journal},
+  volume={79},
+  number={1},
+  pages={305--313},
+  year={2015},
+  publisher={Wiley Online Library}
+}
+
+@article{stamenkovic2015modeling,
+  title={Modeling of ammonia emission in the USA and EU countries using an artificial neural network approach},
+  author={Stamenkovi{\'c}, Lidija J and Antanasijevi{\'c}, Davor Z and Risti{\'c}, Mirjana D and Peri{\'c}-Gruji{\'c}, Aleksandra A and Pocajt, Viktor V},
+  doi={https://doi.org/10.1007/s11356-015-5075-5},
+  journal={Environmental Science and Pollution Research},
+  volume={22},
+  number={23},
+  pages={18849--18858},
+  year={2015},
+  publisher={Springer}
+}
+
+@article{timilsena2015enhanced,
+  title={Enhanced efficiency fertilisers: a review of formulation and nutrient release patterns},
+  author={Timilsena, Yakindra Prasad and Adhikari, Raju and Casey, Phil and Muster, Tim and Gill, Harsharn and Adhikari, Benu},
+  journal={Journal of the Science of Food and Agriculture},
+  volume={95},
+  number={6},
+  pages={1131--1142},
+  year={2015},
+  publisher={Wiley Online Library}
+}
+
+@inproceedings{Chen2016,
+    title={XGBoost: A Scalable Tree Boosting System},
+    author={Chen, Tianqi and Guestrin, Carlos},
+    doi={https://doi.org/10.1145/2939672.2939785},
+    booktitle={Proceedings of the 22nd ACM SIGKDD International Conference on Knowledge Discovery and Data Mining},
+    pages={785-794},
+    year={2016},
+    publisher={Association for Computing Machinery},
+}
+
+@article{congreves2016predicting,
+    title={Predicting ammonia volatilization after field application of swine slurry: DNDC model development},
+    author={Congreves, KA and Grant, BB and Dutta, B and Smith, WN and Chantigny, MH and Rochette, P and Desjardins, RL},
+    doi={https://doi.org/10.1016/j.agee.2015.10.028},
+    journalfull={Agriculture, Ecosystems \& Environment},
+    journal={Agric. Ecosyst. Environ.},
+    volume={219},
+    pages={179-189},
+    year={2016},
+    publisher={Elsevier}
+}
+
+@article{dutta2016improving,
+  title={Improving DNDC model to estimate ammonia loss from urea fertilizer application in temperate agroecosystems},
+  author={Dutta, B and Congreves, KA and Smith, WN and Grant, BB and Rochette, P and Chantigny, MH and Desjardins, RL},
+  doi={https://doi.org/10.1007/s10705-016-9804-z},
+  journal={Nutrient cycling in agroecosystems},
+  volume={106},
+  number={3},
+  pages={275--292},
+  year={2016},
+  publisher={Springer}
+}
+
+@article{hani2016ammonia,
+    title={Ammonia emission after slurry application to grassland in Switzerland},
+    author={Häni, Christoph and Sintermann, Jörg and Kupper, Thomas and Jocher, Markus and Neftel, Albrecht},
+    doi={https://doi.org/10.1016/j.atmosenv.2015.10.069},
+    journalfull={Atmospheric Environment},
+    journal={Atmos. Environ.},
+    volume={125},
+    pages={92-99},
+    year={2016},
+    publisher={Elsevier}
+}
+
+@article{pacholski2016calibrated,
+  title={Calibrated Passive Sampling-Multi-plot Field measurements of NH 3 emissions with a combination of dynamic tube Method and Passive samplers},
+  author={Pacholski, Andreas},
+  doi={https://doi:10.3791/53273},
+  journal={JoVE (Journal of Visualized Experiments)},
+  number={109},
+  pages={e53273},
+  year={2016}
+}
+
+@article{pan2016ammonia,
+  title={Ammonia volatilization from synthetic fertilizers and its mitigation strategies: A global synthesis},
+  author={Pan, Baobao and Lam, Shu Kee and Mosier, Arvin and Luo, Yiqi and Chen, Deli},
+  doi={https://doi.org/10.1016/j.agee.2016.08.019},
+  journal={Agriculture, Ecosystems \& Environment},
+  volume={232},
+  pages={283--289},
+  year={2016},
+  publisher={Elsevier}
+}
+
+@article{pascal2016mortality,
+  title={The mortality impacts of fine particles in France},
+  author={Pascal, Mathilde and de Crouy Chanel, Perrine and Wagner, V{\'e}r{\`e}ne and Corso, Magali and Tillier, Claude and Bentayeb, Malek and Blanchard, Myriam and Cochet, Amandine and Pascal, Laurence and Host, Sabine and others},
+  doi={https://doi.org/10.1016/j.scitotenv.2016.06.213},
+  journal={Science of the Total Environment},
+  volume={571},
+  pages={416--425},
+  year={2016},
+  publisher={Elsevier}
+}
+
+@article{whitburn2016flexible,
+    title={A flexible and robust neural network IASI-NH3 retrieval algorithm},
+    author={Whitburn, Simon and Van Damme, Martin and Clarisse, Lieven and Bauduin, S and Heald, CL and Hadji-Lazaro, Juliette and Hurtmans, Daniel and Zondlo, Mark Andrew and Clerbaux, Cathy and Coheur, P-F},
+    doi={https://doi.org/10.1002/2016JD024828},
+    journalfull={Journal of Geophysical Research: Atmospheres},
+    journal={J. Geophys. Res. Atmos.},
+    volume={121},
+    number={11},
+    pages={6581-6599},
+    year={2016},
+    publisher={Wiley Online Library}
+}
+
+@article{duncan2017nitrous,
+    title={Nitrous oxide and ammonia emissions from injected and broadcast-applied dairy slurry},
+    author={Duncan, EW and Dell, CJ and Kleinman, PJA and Beegle, DB},
+    doi={https://doi.org/10.2134/jeq2016.05.0171},
+    journalfull={Journal of environmental quality},
+    journal={J. Environ. Qual.},
+    volume={46},
+    number={1},
+    pages={36-44},
+    year={2017},
+    publisher={Wiley Online Library}
+}
+
+
+@article{machet2017dynamic,
+  title={A dynamic decision-making tool for calculating the optimal rates of N application for 40 annual crops while minimising the residual level of mineral N at harvest},
+  author={Machet, Jean-Marie and Dubrulle, Pascal and Damay, Nathalie and Duval, R{\'e}my and Julien, Jean-Luc and Recous, Sylvie},
+  doi={https://doi.org/10.3390/agronomy7040073},
+  journal={Agronomy},
+  volume={7},
+  number={4},
+  pages={73},
+  year={2017},
+  publisher={MDPI}
+}
+
+@article{rebuffi2017learning,
+  title={Learning multiple visual domains with residual adapters},
+  author={Rebuffi, Sylvestre-Alvise and Bilen, Hakan and Vedaldi, Andrea},
+  doi={https://doi.org/10.48550/arXiv.1705.08045},
+  journal={Advances in neural information processing systems},
+  volume={30},
+  year={2017}
+}
+
+@article{riahi2017shared,
+  title={The Shared Socioeconomic Pathways and their energy, land use, and greenhouse gas emissions implications: An overview},
+  author={Riahi, Keywan and Van Vuuren, Detlef P and Kriegler, Elmar and Edmonds, Jae and O’neill, Brian C and Fujimori, Shinichiro and Bauer, Nico and Calvin, Katherine and Dellink, Rob and Fricko, Oliver and others},
+  doi={https://doi.org/10.1016/j.gloenvcha.2016.05.009},
+  journal={Global environmental change},
+  volume={42},
+  pages={153--168},
+  year={2017},
+  publisher={Elsevier}
+}
+
+@article{silva2017urease,
+  title={Urease inhibitor NBPT on ammonia volatilization and crop productivity: A meta-analysis},
+  author={Silva, Aij{\^a}nio GB and Sequeira, Cleiton H and Sermarini, Renata A and Otto, Rafael},
+  doi={https://doi.org/10.2134/agronj2016.04.0200},
+  journal={Agronomy Journal},
+  volume={109},
+  number={1},
+  pages={1--13},
+  year={2017},
+  publisher={Wiley Online Library}
+}
+
+@article{Warner2017inc,
+    title={Increased atmospheric ammonia over the world's major agricultural areas detected from space},
+    author={Warner, J. X. and Dickerson, R. R. and Wei, Z. and Strow, L. L. and Wang, Y. and Liang, Q.},
+    doi={https://doi.org/10.1002/2016GL072305},
+    journalfull={Geophysical Research Letters},
+    journal={Geophys. Res. Lett.},
+    volume={44},
+    number={6},
+    pages={2875-2884},
+    year={2017},
+    publisher={Wiley Online Library}
+}
+
+@article{hafner2018alfam2,
+    title={The ALFAM2 database on ammonia emission from field-applied manure: Description and illustrative analysis},
+    author={Sasha D. Hafner and Andreas Pacholski and Shabtai Bittman and William Burchill and Wim Bussink and Martin Chantigny and Marco Carozzi and Sophie Génermont and Christoph Häni and Martin N. Hansen and Jan Huijsmans and Derek Hunt and Thomas Kupper and Gary Lanigan and Benjamin Loubet and Tom Misselbrook and John J. Meisinger and Albrecht Neftel and Tavs Nyord and Simon V. Pedersen and Jörg Sintermann and Rodney B. Thompson and Bert Vermeulen and Annette V. Vestergaard and Polina Voylokov and John R. Williams and Sven G. Sommer},
+    doi={https://doi.org/10.1016/j.agrformet.2017.11.027},
+    journalfull={Agricultural and Forest Meteorology},
+    journal={Agric. For. Meteorol.},
+    volume={258},
+    pages={66-79},
+    year={2018},
+    publisher={Elsevier}
+}
+
+@article{huijsmans2018model,
+    title={A model for estimating seasonal trends of ammonia emission from cattle manure applied to grassland in the Netherlands},
+    author={Huijsmans, JFM and Vermeulen, GD and Hol, JMG and Goedhart, PW},
+    doi={https://doi.org/10.1016/j.atmosenv.2017.10.050},
+    journalfull={Atmospheric Environment},
+    journal={Atmos. Environ.},
+    volume={173},
+    pages={231-238},
+    year={2018},
+    publisher={Elsevier}
+}
+
+@article{loubet2018evaluation,
+  title={Evaluation of a new inference method for estimating ammonia volatilisation from multiple agronomic plots},
+  author={Loubet, Benjamin and Carozzi, Marco and Voylokov, Polina and Cohan, Jean-Pierre and Trochard, Robert and G{\'e}nermont, Sophie},
+  doi={https://doi.org/10.5194/bg-15-3439-2018},
+  journal={Biogeosciences},
+  volume={15},
+  number={11},
+  pages={3439--3460},
+  year={2018},
+  publisher={Copernicus Publications G{\"o}ttingen, Germany}
+}
+
+@article{park2018acidification,
+    title={Acidification of pig slurry effects on ammonia and nitrous oxide emissions, nitrate leaching, and perennial ryegrass regrowth as estimated by 15N-urea flux},
+    author={Park, Sang Hyun and Lee, Bok Rye and Jung, Kwang Hwa and Kim, Tae Hwan},
+    doi={https://doi.org/10.5713/ajas.17.0556},
+    journalfull={Asian-Australasian journal of animal sciences},
+    journal={Asian-Australas. J. Anim. Sci.},
+    volume={31},
+    number={3},
+    pages={457},
+    year={2018},
+    publisher={Asian-Australasian Association of Animal Production Societies (AAAP)}
+}
+
+@article{ramanantenasoa2018new,
+  title={A new framework to estimate spatio-temporal ammonia emissions due to nitrogen fertilization in France},
+  author={Ramanantenasoa, Maharavo Marie Julie and Gilliot, Jean-Marc and Mignolet, Catherine and Bedos, Carole and Mathias, Etienne and Eglin, Thomas and Makowski, David and G{\'e}nermont, Sophie},
+  doi={https://doi.org/10.1016/j.scitotenv.2018.06.202},
+  journal={Science of the Total Environment},
+  volume={645},
+  pages={205--219},
+  year={2018},
+  publisher={Elsevier}
+}
+
+@article{Yu2018Long,
+    title={Long-Term Trend of Gaseous Ammonia Over the United States: Modeling and Comparison With Observations},
+    author={Yu, Fangqun and Nair, Arshad Arjunan and Luo, Gan},
+    doi={https://doi.org/10.1029/2018JD028412},
+    journalfull={Journal of Geophysical Research: Atmospheres},
+    journal={J. Geophys. Res. Atmos.},
+    volume={123},
+    number={15},
+    pages={8315-8325},
+    year={2018},
+    publisher={Wiley Online Library}
+}
+
+@article{zhang2018overview,
+  title={An overview of multi-task learning},
+  author={Zhang, Yu and Yang, Qiang},
+  doi={https://doi.org/10.1093/nsr/nwx105},
+  journal={National Science Review},
+  volume={5},
+  number={1},
+  pages={30--43},
+  year={2018},
+  publisher={Oxford University Press}
+}
+
+@article{feng2019recurrent,
+    title={Recurrent Neural Network and random forest for analysis and accurate forecast of atmospheric pollutants: a case study in Hangzhou, China},
+    author={Feng, Rui and Zheng, Hui-jun and Gao, Han and Zhang, An-ran and Huang, Chong and Zhang, Jun-xi and Luo, Kun and Fan, Jian-ren},
+    doi={https://doi.org/10.1016/j.jclepro.2019.05.319},
+    journalfull={Journal of cleaner production},
+    journal={J. Clean. Prod.},
+    volume={231},
+    pages={1005-1015},
+    year={2019},
+    publisher={Elsevier}
+}
+
+
+@article{giannakis2019costs,
+  title={Costs and benefits of agricultural ammonia emission abatement options for compliance with European air quality regulations},
+  author={Giannakis, Elias and Kushta, Jonilda and Bruggeman, Adriana and Lelieveld, Jos},
+  doi={https://doi.org/10.1186/s12302-019-0275-0},
+  journal={Environmental Sciences Europe},
+  volume={31},
+  number={1},
+  pages={93},
+  year={2019},
+  publisher={Springer}
+}
+
+@article{hafner2019flexible,
+    title={A flexible semi-empirical model for estimating ammonia volatilization from field-applied slurry},
+    author={Sasha D. Hafner and Andreas Pacholski and Shabtai Bittman and Marco Carozzi and Martin Chantigny and Sophie Génermont and Christoph Häni and Martin N. Hansen and Jan Huijsmans and Thomas Kupper and Tom Misselbrook and Albrecht Neftel and Tavs Nyord and Sven G. Sommer},
+    doi={https://doi.org/10.1016/j.atmosenv.2018.11.034},
+    journalfull={Atmospheric Environment},
+    journal={Atmos. Environ.},
+    volume={199},
+    pages={474-484},
+    year={2019},
+    publisher={Elsevier}
+}
+
+@article{raissi2019physics,
+  title={Physics-informed neural networks: A deep learning framework for solving forward and inverse problems involving nonlinear partial differential equations},
+  author={Raissi, Maziar and Perdikaris, Paris and Karniadakis, George E},
+  doi={https://doi.org/10.1016/j.jcp.2018.10.045},
+  journal={Journal of Computational physics},
+  volume={378},
+  pages={686--707},
+  year={2019},
+  publisher={Elsevier}
+}
+
+@article{ramanantenasoa2019meta,
+    title={Meta-modeling methods for estimating ammonia volatilization from nitrogen fertilizer and manure applications},
+    author={Ramanantenasoa, Maharavo Marie Julie and G{\'e}nermont, Sophie and Gilliot, Jean-Marc and Bedos, Carole and Makowski, David},
+    doi={https://doi.org/10.1016/j.jenvman.2019.01.066},
+    journalfull={Journal of environmental management},
+    journal={J. Environ. Manag.},
+    volume={236},
+    pages={195--205},
+    year={2019},
+    publisher={Elsevier}
+}
+
+@article{shorten2019survey,
+    title={A survey on image data augmentation for deep learning},
+    author={Shorten, Connor and Khoshgoftaar, Taghi M},
+    doi={https://doi.org/10.1186/s40537-019-0197-0},
+    journalfull={Journal of big data},
+    journal={J. Big Data},
+    volume={6},
+    number={1},
+    pages={1-48},
+    year={2019},
+    publisher={Springer}
+}
+
+@article{soenen2019mise,
+  title={Mise au point du pilotage int{\'e}gral de l’azote avec le mod{\`e}le de culture CHN: approche CHN-conduite},
+  author={Soenen, B and Bonnefoy, M and Delpech, C and Piquemal, B and Descazeaux, P and Degan, F and Laurent, F},
+  journal={Agric. Ecosyst. Environ},
+  volume={1},
+  pages={75--86},
+  year={2019}
+}
+
+@article{vigan2019development,
+  title={Development of a database to collect emission values for livestock systems},
+  author={Vigan, Aurore and Hassouna, M{\'e}lynda and Guingand, Nadine and Brame, Coline and Edouard, Nad{\`e}ge and Eglin, Thomas and Espagnol, Sandrine and Eug{\`e}ne, Maguy and G{\'e}nermont, Sophie and Lagadec, Sol{\`e}ne and others},
+  doi={https://doi.org/10.2134/jeq2019.01.0007},
+  journal={Journal of Environmental Quality},
+  volume={48},
+  number={6},
+  pages={1899--1906},
+  year={2019},
+  publisher={Wiley Online Library}
+}
+
+@article{yao2019causes,
+    title={Causes of large increases in atmospheric ammonia in the last decade across North America},
+    author={Yao, Xiaohong and Zhang, Leiming},
+    doi={https://doi.org/10.1021/acsomega.9b03284},
+    journalfull={ACS omega},
+    journal={ACS omega},
+    volume={4},
+    number={26},
+    pages={22133-22142},
+    year={2019},
+    publisher={ACS Publications}
+}
+
+@article{zhan2019improved,
+  title={Improved Jayaweera-Mikkelsen model to quantify ammonia volatilization from rice paddy fields in China},
+  author={Zhan, Xiaoying and Chen, Chuan and Wang, Qihui and Zhou, Feng and Hayashi, Kentaro and Ju, Xiaotang and Lam, Shu Kee and Wang, Yonghua and Wu, Yali and Fu, Jin and others},
+  doi={https://doi.org/10.1007/s11356-019-04275-2},
+  journal={Environmental Science and Pollution Research},
+  volume={26},
+  number={8},
+  pages={8136--8147},
+  year={2019},
+  publisher={Springer}
+}
+
+@article{fixen2020brief,
+  title={A brief account of the genesis of 4R nutrient stewardship},
+  author={Fixen, Paul E},
+  doi={https://doi.org/10.1002/agj2.20315},
+  journal={Agronomy Journal},
+  volume={112},
+  number={5},
+  pages={4511--4518},
+  year={2020},
+  publisher={Wiley Online Library}
+}
+
+@article{fortems2020alternative,
+  title={Do alternative inventories converge on the spatiotemporal representation of spring ammonia emissions in France?},
+  author={Fortems-Cheiney, Audrey and Dufour, Gaelle and Dufoss{\'e}, Karine and Couvidat, Florian and Gilliot, Jean-Marc and Siour, Guillaume and Beekmann, Matthias and Foret, Gilles and Meleux, Frederik and Clarisse, Lieven and others},
+  doi={https://doi.org/10.5194/acp-20-13481-2020},
+  journal={Atmospheric Chemistry and Physics},
+  volume={20},
+  number={21},
+  pages={13481--13495},
+  year={2020},
+  publisher={Copernicus GmbH}
+}
+
+@article{hamrani2020machine,
+    title={Machine learning for predicting greenhouse gas emissions from agricultural soils},
+    author={Hamrani, Abderrachid and Akbarzadeh, Abdolhamid and Madramootoo, Chandra A},
+    doi={https://doi.org/10.1016/j.scitotenv.2020.140338},
+    journalfull={Science of The Total Environment},
+    journal={Sci. Total Environ.},
+    volume={741},
+    pages={140338},
+    year={2020},
+    publisher={Elsevier}
+}
+
+@article{scotto2020review,
+  title={A review of chamber and micrometeorological methods to quantify NH3 emissions from fertilisers field application},
+  author={Scotto di Perta, Ester and Fiorentino, Nunzio and Carozzi, Marco and Cervelli, Elena and Pindozzi, Stefania},
+  doi={https://doi.org/10.1155/2020/8909784},
+  journal={International Journal of Agronomy},
+  volume={2020},
+  number={1},
+  pages={8909784},
+  year={2020},
+  publisher={Wiley Online Library}
+}
+
+@article{SHEN2020intense,
+    title={Intense Warming Will Significantly Increase Cropland Ammonia Volatilization Threatening Food Security and Ecosystem Health},
+    author={Huizhong Shen and Yilin Chen and Yongtao Hu and Limei Ran and Shu Kee Lam and Gertrude K. Pavur and Feng Zhou and Jonathan E. Pleim and Armistead G. Russell},
+    doi={https://doi.org/10.1016/j.oneear.2020.06.015},
+    journalfull={One Earth},
+    journal={One Earth},
+    volume={3},
+    number={1},
+    pages={126-134},
+    year={2020},
+    publisher={Elsevier}
+}
+
+@article{vira2020improved,
+  title={An improved mechanistic model for ammonia volatilization in Earth system models: Flow of Agricultural Nitrogen version 2 (FANv2)},
+  author={Vira, Julius and Hess, Peter and Melkonian, Jeff and Wieder, William R},
+  doi={https://doi.org/10.5194/gmd-13-4459-2020},
+  journal={Geoscientific Model Development},
+  volume={13},
+  number={9},
+  pages={4459--4490},
+  year={2020},
+  publisher={Copernicus GmbH}
+}
+
+@article{zhuang2020comprehensive,
+  title={A comprehensive survey on transfer learning},
+  author={Zhuang, Fuzhen and Qi, Zhiyuan and Duan, Keyu and Xi, Dongbo and Zhu, Yongchun and Zhu, Hengshu and Xiong, Hui and He, Qing},
+  doi={https://doi.org/10.1109/JPROC.2020.3004555},
+  journal={Proceedings of the IEEE},
+  volume={109},
+  number={1},
+  pages={43--76},
+  year={2020},
+  publisher={Ieee}
+}
+
+
+@article{beltran2021dataman,
+  title={DATAMAN: A global database of nitrous oxide and ammonia emission factors for excreta deposited by livestock and land-applied manure},
+  author={Beltran, Ignacio and Van der Weerden, Tony J and Alfaro, Marta A and Amon, Barbara and de Klein, Cecile AM and Grace, Peter and Hafner, Sasha and Hassouna, M{\'e}lynda and Hutchings, Nicholas and Krol, Dominika J and others},
+  doi={https://doi.org/10.1002/jeq2.20186},
+  journal={Journal of Environmental Quality},
+  volume={50},
+  number={2},
+  pages={513--527},
+  year={2021},
+  publisher={Wiley Online Library}
+}
+
+@article{bommasani2021opportunities,
+  title={On the opportunities and risks of foundation models},
+  author={Bommasani, Rishi and Hudson, Drew A and Adeli, Ehsan and Altman, Russ and Arora, Simran and von Arx, Sydney and Bernstein, Michael S and Bohg, Jeannette and Bosselut, Antoine and Brunskill, Emma and others},
+  doi={https://doi.org/10.48550/arXiv.2108.07258},
+  journal={arXiv preprint arXiv:2108.07258},
+  year={2021}
+}
+
+@article{dawar2021biochar,
+  title={Biochar and urease inhibitor mitigate NH3 and N2O emissions and improve wheat yield in a urea fertilized alkaline soil},
+  author={Dawar, Khadim and Fahad, Shah and Jahangir, MMR and Munir, Iqbal and Alam, Syed Sartaj and Khan, Shah Alam and Mian, Ishaq Ahmad and Datta, Rahul and Saud, Shah and Banout, Jan and others},
+  doi={https://doi.org/10.1038/s41598-021-96771-0},
+  journal={Scientific reports},
+  volume={11},
+  number={1},
+  pages={17413},
+  year={2021},
+  publisher={Nature Publishing Group UK London}
+}
+
+@article{HE2021satellite,
+    title={Satellite-detected ammonia changes in the United States: Natural or anthropogenic impacts},
+    author={Yaqian He and Rongting Xu and Stephen A. Prior and Di Yang and Anni Yang and Jian Chen},
+    doi={https://doi.org/10.1016/j.scitotenv.2021.147899},
+    journalfull={Science of The Total Environment},
+    journal={Sci. Total Environ.},
+    volume={789},
+    pages={147899},
+    year={2021},
+    publisher={Elsevier}
+}
+
+@article{farahani2021brief,
+  title={A brief review of domain adaptation},
+  author={Farahani, Abolfazl and Voghoei, Sahar and Rasheed, Khaled and Arabnia, Hamid R},
+  doi={https://doi.org/10.1007/978-3-030-71704-9_65},
+  journal={Advances in data science and information engineering: proceedings from ICDATA 2020 and IKE 2020},
+  pages={877--894},
+  year={2021},
+  publisher={Springer}
+}
+
+@article{granata2021forecasting,
+  title={Forecasting evapotranspiration in different climates using ensembles of recurrent neural networks},
+  author={Granata, Francesco and Di Nunno, Fabio},
+  doi={https://doi.org/10.1016/j.agwat.2021.107040},
+  journal={Agricultural Water Management},
+  volume={255},
+  pages={107040},
+  year={2021},
+  publisher={Elsevier}
+}
+
+@article{karniadakis2021physics,
+  title={Physics-informed machine learning},
+  author={Karniadakis, George Em and Kevrekidis, Ioannis G and Lu, Lu and Perdikaris, Paris and Wang, Sifan and Yang, Liu},
+  doi={https://doi.org/10.1038/s42254-021-00314-5},
+  journal={Nature Reviews Physics},
+  volume={3},
+  number={6},
+  pages={422--440},
+  year={2021},
+  publisher={Nature Publishing Group UK London}
+}
+
+@article{tarin2021contribution,
+    title={Contribution of fine particulate matter to present and future premature mortality over Europe: A non-linear response},
+    author={Tar{\'\i}n-Carrasco, Patricia and Im, Ulas and Geels, Camilla and Palacios-Pe{\~n}a, Laura and Jim{\'e}nez-Guerrero, Pedro},
+    doi={https://doi.org/10.1016/j.envint.2021.106517},
+    journalfull={Environment international},
+    journal={Environ. Int.},
+    volume={153},
+    pages={106517},
+    year={2021},
+    publisher={Elsevier}
+}
+
+@article{van2021global,
+    title={Global, regional and national trends of atmospheric ammonia derived from a decadal (2008--2018) satellite record},
+    author={Van Damme, Martin and Clarisse, Lieven and Franco, Bruno and Sutton, Mark A and Erisman, Jan Willem and Kruit, Roy Wichink and Van Zanten, Margreet and Whitburn, Simon and Hadji-Lazaro, Juliette and Hurtmans, Daniel and others},
+    doi={https://doi.org/10.1088/1748-9326/abd5e0},
+    journalfull={Environmental Research Letters},
+    journal={Environ. Res. Lett.},
+    volume={16},
+    number={5},
+    pages={055017},
+    year={2021},
+    publisher={IOP Publishing}
+}
+
+@article{zhang2021survey,
+  title={A survey on multi-task learning},
+  author={Zhang, Yu and Yang, Qiang},
+  doi={https://doi.org/10.1109/TKDE.2021.3070203},
+  journal={IEEE transactions on knowledge and data engineering},
+  volume={34},
+  number={12},
+  pages={5586--5609},
+  year={2021},
+  publisher={IEEE}
+}
+
+@article{han2022semi,
+  title={A semi-empirical semi-process model of ammonia volatilization from paddy fields under different irrigation modes and urea application regimes},
+  author={Han, Huanhao and Gao, Rong and Cui, Yuanlai and Gu, Shixiang},
+  doi={https://doi.org/10.1016/j.agwat.2022.107841},
+  journal={Agricultural Water Management},
+  volume={272},
+  pages={107841},
+  year={2022},
+  publisher={Elsevier}
+}
+
+@article{menegat2022greenhouse,
+  title={Greenhouse gas emissions from global production and use of nitrogen synthetic fertilisers in agriculture},
+  author={Menegat, Stefano and Ledo, Alicia and Tirado, Reyes},
+  doi={https://doi.org/10.1038/s41598-022-18773-w},
+  journal={Scientific Reports},
+  volume={12},
+  number={1},
+  pages={14490},
+  year={2022},
+  publisher={Nature Publishing Group UK London}
+}
+
+@article{parnaudeau2022agro,
+  title={Agro-{\'e}co-Syst'N: Identification de syst{\`e}mes agro{\'e}cologiques {\`a} hautes performances azot{\'e}es par le diagnostic avec l'outil Syst'N{\textregistered}},
+  author={Parnaudeau, Virginie and Heurtaux, Mathilde and Reau, Raymond and Vian, Jean-Fran{\c{c}}ois and Le Gall, Chlo{\'e} and Dupont, Aur{\'e}lien and Dubrulle, Pascal and Duval, J{\'e}r{\^o}me and Lef{\`e}vre, L and Bedu, Magali and others},
+  doi={https://doi.org/10.17180/ciag-2022-vol85-art01}, 
+  journal={Innovations Agronomiques},
+  volume={85},
+  pages={1--15},
+  year={2022}
+}
+
+@article{pedersen2022effectiveness,
+  title={Effectiveness of mechanical separation for reducing ammonia loss from field-applied slurry: Assessment through literature review and model calculations},
+  author={Pedersen, Johanna and Hafner, Sasha D and Adamsen, Anders Peter S},
+  doi={https://doi.org/10.1016/j.jenvman.2022.116196},
+  journal={Journal of environmental management},
+  volume={323},
+  pages={116196},
+  year={2022},
+  publisher={Elsevier}
+}
+
+@article{wyer2022ammonia,
+  title={Ammonia emissions from agriculture and their contribution to fine particulate matter: A review of implications for human health},
+  author={Wyer, Katie E and Kelleghan, David B and Blanes-Vidal, Victoria and Schauberger, G{\"u}nther and Curran, Thomas P},
+  doi={https://doi.org/10.1016/j.jenvman.2022.116285},
+  journal={Journal of environmental management},
+  volume={323},
+  pages={116285},
+  year={2022},
+  publisher={Elsevier}
+}
+
+@article{zhang2022survey,
+  title={A survey on negative transfer},
+  author={Zhang, Wen and Deng, Lingfei and Zhang, Lei and Wu, Dongrui},
+  doi={https://doi.org/10.1109/JAS.2022.106004},
+  journal={IEEE/CAA Journal of Automatica Sinica},
+  volume={10},
+  number={2},
+  pages={305--329},
+  year={2022},
+  publisher={IEEE}
+}
+
+@article{beaudor2023global,
+  title={Global agricultural ammonia emissions simulated with the ORCHIDEE land surface model},
+  author={Beaudor, Maureen and Vuichard, Nicolas and Lathi{\`e}re, Juliette and Evangeliou, Nikolaos and Van Damme, Martin and Clarisse, Lieven and Hauglustaine, Didier},
+  doi={https://doi.org/10.5194/gmd-16-1053-2023},
+  journal={Geoscientific Model Development},
+  volume={16},
+  number={3},
+  pages={1053--1081},
+  year={2023},
+  publisher={Copernicus GmbH}
+}
+
+@article{ten2023effects,
+    title={Effects of liquid manure application techniques on ammonia emission and winter wheat yield},
+    author={ten Huf, Martin and Reinsch, Thorsten and Zutz, Mareike and Essich, Christoph and Ruser, Reiner and Buchen-Tschiskale, Caroline and Flessa, Heinz and Olfs, Hans-Werner},
+    doi={https://doi.org/10.3390/agronomy13020472},
+    journal={Agronomy},
+    volume={13},
+    number={2},
+    pages={472},
+    year={2023},
+    publisher={MDPI}
+}
+
+
+@article{blanc2024performance,
+  title={Performance of co-designed diversified Mediterranean cropping systems: Hybridizing stakeholders' knowledge and modelling data},
+  author={Blanc, Louise and Rezgui, Ferdaous and Hossard, Laure and Lampurlan{\'e}s, Jorge and Simon-Miquel, Gen{\'\i}s and Plaza-Bonilla, Daniel},
+  doi={https://doi.org/10.1016/j.eja.2024.127282},
+  journal={European Journal of Agronomy},
+  volume={159},
+  pages={127282},
+  year={2024},
+  publisher={Elsevier}
+}
+
+@article{genedy2024physics,
+  title={A physics-informed long short-term memory (LSTM) model for estimating ammonia emissions from dairy manure during storage},
+  author={Genedy, Rana A and Chung, Matthias and Shortridge, Julie E and Ogejo, Jactone A},
+  doi={https://doi.org/10.1016/j.scitotenv.2023.168885},
+  journal={Science of The Total Environment},
+  volume={912},
+  pages={168885},
+  year={2024},
+  publisher={Elsevier}
+}
+
+@article{hurtado2024drivers,
+  title={Drivers of ammonia volatilization in Mediterranean climate cropping systems},
+  author={Hurtado, Juliana and Vel{\'a}zquez, Eduardo and Lassaletta, Luis and Guardia, Guillermo and Aguilera, Eduardo and Sanz-Cobena, Alberto},
+  doi={https://doi.org/10.1016/j.envpol.2023.122814},
+  journal={Environmental Pollution},
+  volume={341},
+  pages={122814},
+  year={2024},
+  publisher={Elsevier}
+}
+
+
+@article{jiang2024dynamical,
+  title={A dynamical process-based model for quantifying global agricultural ammonia emissions--AMmonia--CLIMate v1. 0 (AMCLIM v1. 0)--Part 1: Land module for simulating emissions from synthetic fertilizer use},
+  author={Jiang, Jize and Stevenson, David S and Sutton, Mark A},
+  doi={https://doi.org/10.5194/gmd-17-8181-2024},
+  journal={Geoscientific Model Development},
+  volume={17},
+  number={22},
+  pages={8181--8222},
+  year={2024},
+  publisher={Copernicus Publications G{\"o}ttingen, Germany}
+}
+
+@article{kamp2024comparison,
+    title={Comparison of two micrometeorological and three enclosure methods for measuring ammonia emission after slurry application in two field experiments},
+    author={Kamp, Jesper N and Hafner, Sasha D and Huijsmans, Jan and van Boheemen, Koen and Götze, Hannah and Pacholski, Andreas and Pedersen, Johanna},
+    doi={https://doi.org/10.1016/j.agrformet.2024.110077},
+    journalfull={Agricultural and Forest Meteorology},
+    journal={Agric. For. Meteorol.},
+    volume={354},
+    pages={110077},
+    year={2024},
+    publisher={Elsevier}
+}
+
+@article{matse2024field,
+  title={Field efficacy of urease inhibitors for mitigation of ammonia emissions in agricultural field settings: a systematic review},
+  author={Matse, Dumsane Themba and Krol, Dominika J and Richards, Karl G and Danaher, Martin and Cummins, Enda and Wang, Xin and Forrestal, Patrick J},
+  doi={https://doi.org/10.3389/fenvs.2024.1462098},
+  journal={Frontiers in Environmental Science},
+  volume={12},
+  pages={1462098},
+  year={2024},
+  publisher={Frontiers Media SA}
+}
+
+@article{wang2024reducing,
+  title={Reducing soil nitrogen losses from fertilizer use in global maize and wheat production},
+  author={Wang, Chao and Shen, Yun and Fang, Xiantao and Xiao, Shuqi and Liu, Genyuan and Wang, Ligang and Gu, Baojing and Zhou, Feng and Chen, Deli and Tian, Hanqin and others},
+  doi={https://doi.org/10.1038/s41561-024-01542-x},
+  journal={Nature Geoscience},
+  volume={17},
+  number={10},
+  pages={1008--1015},
+  year={2024},
+  publisher={Nature Publishing Group UK London}
+}
+
+@article{xu2024fertilizer,
+    title={Fertilizer management for global ammonia emission reduction},
+    author={Xu, Peng and Li, Geng and Zheng, yi and Fung, Jimmy and Chen, Anping and Zeng, Zhenzhong and Shen, Huizhong and Hu, Min and Mao, Jiafu and Zheng, Yan and Cui, Xiaoqing and Guo, Zhilin and Chen, Yilin and Feng, Lian and He, Shaokun and Zhang, Xuguo and Lau, Alexis and Tao, Shu and Houlton, Benjamin},
+    doi={https://doi.org/10.1038/s41586-024-07020-z},
+    journalfull={Nature},
+    journal={Nature},
+    volume={626},
+    number={8000},
+    pages={792-798},
+    year={2024},
+    publisher={Nature Publishing Group}
+}
+
+@article{beaudor2025evaluating,
+  title={Evaluating present-day and future impacts of agricultural ammonia emissions on atmospheric chemistry and climate},
+  author={Beaudor, Maureen and Hauglustaine, Didier and Lathi{\`e}re, Juliette and Van Damme, Martin and Clarisse, Lieven and Vuichard, Nicolas},
+  doi={https://doi.org/10.5194/acp-25-2017-2025},
+  journal={Atmospheric Chemistry and Physics},
+  volume={25},
+  number={4},
+  pages={2017--2046},
+  year={2025},
+  publisher={Copernicus Publications G{\"o}ttingen, Germany}
+}
+
+@article{bergstrom2025atmospheric,
+  title={Atmospheric Ammonia in Sweden: Regional Modeling and Assessment of National Emission Reduction Benefits},
+  author={Bergstr{\"o}m, Robert and Olenius, Tinja},
+  doi={https://doi.org/10.16993/tellusb.1881},
+  journal={Tellus B: Chemical and Physical Meteorology},
+  volume={77},
+  number={1},
+  year={2025}
+}
+
+@article{FAVROT2025,
+    title={Machine learning for ammonia volatilization prediction and slurry application management},
+    author={Armand Favrot and Sophie Génermont and Céline Décuq and David Makowski},
+    doi={https://doi.org/10.1016/j.jes.2025.04.045},
+    journalfull={Journal of Environmental Sciences},
+    journal={J. Environ. Sci.},
+    volume={160},
+    pages={481-489},
+    year={2026},
+    publisher={Elsevier}
+}
+
+
+@article{gozio2025enhanced,
+  title={Enhanced ammonia volatilization prediction with EPIC: Model description and testing of different fertilizers},
+  author={Gozio, Andrea and Longo, Matteo and Cabrera, Miguel L and Izaurralde, Roberto C{\'e}sar and Kissel, David E and Lazzaro, Barbara and Dal Ferro, Nicola and Morari, Francesco},
+  doi={https://doi.org/10.1016/j.eja.2025.127616},
+  journal={European Journal of Agronomy},
+  volume={168},
+  pages={127616},
+  year={2025},
+  publisher={Elsevier}
+}
+
+@article{hafner2025improved,
+    title={Improved tools for estimation of ammonia emission from field-applied animal slurry: Refinement of the ALFAM2 model and database},
+    author={Hafner, Sasha D and Pedersen, Johanna and Fu{\ss}, Roland and Kamp, Jesper N{\o}rlem and Dalby, Frederik Rask and Amon, Barbara and Pacholski, Andreas and Adamsen, Anders Peter S and Sommer, Sven Gjedde},
+    doi={https://doi.org/10.1016/j.atmosenv.2024.120910},
+    journalfull={Atmospheric Environment},
+    journal={Atmos. Environ.},
+    volume={340},
+    pages={120910},
+    year={2025},
+    publisher={Elsevier}
+}
+
+
+@article{jiang2025dynamical,
+  title={A dynamical process-based model for quantifying global agricultural ammonia emissions--AMmonia--CLIMate v1. 0 (AMCLIM v1. 0)--Part 2: Livestock farming},
+  author={Jiang, Jize and Stevenson, David S and Uwizeye, Aimable and Tempio, Giuseppe and Falcucci, Alessandra and Casu, Flavia and Sutton, Mark A},
+  doi={https://doi.org/10.5194/gmd-18-5051-2025},
+  journal={Geoscientific Model Development},
+  volume={18},
+  number={16},
+  pages={5051--5099},
+  year={2025},
+  publisher={Copernicus Publications G{\"o}ttingen, Germany}
+}
+
+@article{huijsmansammonia2026,
+  title={Ammonia emission experiments field-applied manure conducted in The Netherlands in 1989-2021},
+  author={Huijsmans, Jan and Goedhart, Paul},
+  doi={https://doi.org/10.4121/a5ec3e90-b25e-4ac0-9f18-4ea559cd2abb.v1},
+  year={2026},
+  publisher={Wageningen University \& Research}
+}
+
+@article{HUTCHINGS2026147438,
+    title = {Higher tier estimation of ammonia emissions from synthetic nitrogen fertilizers in emission inventories: data collation, methodology and analysis},
+    author = {N.J. Hutchings and J. Schoof and M. Mäenpää and A. Pacholski and J. Webb and R. Albrektsen},
+    doi = {https://doi.org/10.1016/j.jclepro.2025.147438},
+    journal = {Journal of Cleaner Production},
+    volume = {540},
+    pages = {147438},
+    year = {2026},
+    publisher={Elsevier}
+}
+
+@article{jiang2026global,
+  title={Global warming increases ammonia emissions and reduces the efficacy of mitigation actions},
+  author={Jiang, Jize and Stevenson, David S and Uwizeye, Aimable and Casu, Flavia AM and Tempio, Giuseppe and Falcucci, Alessandra and Sutton, Mark A},
+  doi={https://doi.org/10.1038/s43247-026-03404-3},
+  journal={Communications Earth \& Environment},
+  year={2026},
+  publisher={Nature Publishing Group UK London}
+}
+
+
+
 

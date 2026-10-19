@@ -1,0 +1,11 @@
+# Exclude personal files, generated files and third-party extension sources.
+/04_perso/
+/.quarto/
+/main_cache/
+/_extensions/
+/renv/
+/01_data/
+**/results/
+**/pdf/
+**/images/
+**/csv/

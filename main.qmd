@@ -1,202 +1,1412 @@
+```{r}
+#| label: setup
+#| include: false
+#| cache: false
+
+library(ggplot2)
+library(dplyr)
+library(tidyr)
+library(knitr)
+
+knitr::opts_chunk$set(
+    dev = if (knitr::is_latex_output()) "cairo_pdf" else "svglite"
+)
+
+source("00_functions/R_functions.R")
+set_plot_theme()
+results_directory = "02_scripts/01_transfer_learning/results"
+
+# Descriptive figures containing restricted data and diagrams are precomputed.
+# Convert the PDFs to SVG for HTML; retain the original PDFs for LaTeX.
+include_precomputed_figure = function(name) {
+    pdf = file.path("02_scripts/02_figures/pdf", paste0(name, ".pdf"))
+    if (knitr::is_latex_output()) return(knitr::include_graphics(pdf))
+
+    svg = file.path("main_files/precomputed", paste0(name, ".svg"))
+    dir.create(dirname(svg), recursive = TRUE, showWarnings = FALSE)
+    status = system2("pdftocairo", c("-svg", pdf, svg))
+    if (status != 0) stop(paste("Could not convert", name, "to SVG."))
+
+    knitr::include_graphics(svg)
+}
+
+```
+
+
 # Introduction
 
-## About this document
+Ammonia ($\mathrm{NH}_3$) is a major atmospheric pollutant and a key component of the global nitrogen cycle [@sutton2011european]. Over recent decades, ammonia emissions have increased in many regions of the world, largely driven by the intensification of agricultural production and fertilizer use ([@Warner2017inc]; [@van2021global]). Once released into the atmosphere, $\mathrm{NH}_3$ contributes to the formation of secondary particulate matter through reactions with acidic compounds, thereby degrading air quality and increasing the risk of respiratory and cardiovascular diseases [@brook2010particulate]. Ammonia can also be transported over long distances before being deposited onto terrestrial and aquatic ecosystems, where it contributes to eutrophication, acidification, and biodiversity loss ([@krupa2003effects]; [@behera2013ammonia]; [@guthrie2018impact]). Ammonia volatilization also represents a substantial loss of nitrogen from agricultural systems, reducing nitrogen use efficiency and generating economic losses as part of the nitrogen applied to crops is lost to the atmosphere [@pan2016ammonia]. Agriculture is by far the dominant source of anthropogenic $\mathrm{NH}_3$ emissions, with livestock manure management and fertilizer application accounting for the largest share of emissions in many regions of the world. Owing to these environmental and public health impacts, reducing and accurately quantifying ammonia emissions has become an important objective for agricultural and environmental policies worldwide.
 
-This document, accompanied by the [tuned git repos](https://github.com/computorg/template-computo-R/), provides a template for writing contributions to **Computo** [@computo].
+Although large datasets of ammonia emissions have been accumulated over the last decades, data availability remains highly uneven across fertilizer types and management conditions (e.g. [@hafner2018alfam2]; [@hafner2025improved]; [@decuq_2024_14170029]; [@xu2024fertilizer]; [@HUTCHINGS2026147438]). For instance, the ALFAM2 database is largely dominated by measurements on cattle and pig slurries, while other fertilizer origins are much less represented. Most measurements concern a limited number of widely used fertilizers, whereas only few observations are available on emerging products and practices. This imbalance is likely to increase in the coming years due to the diversification of agricultural systems, the development of circular economy approaches promoting the recycling of organic residues, and the introduction of novel fertilizer formulations by industry ([@FREC2019]; [@reg2019_1009]). Examples of emerging fertilizer products include digestates, composts, sewage sludge, human urine-derived products, and fertilizers amended with additives designed to reduce environmental impacts and improve nitrogen use efficiency, such as enhanced-efficiency fertilizers [@timilsena2015enhanced]. As a result, reliable prediction of ammonia emissions is particularly challenging for conditions for which only limited experimental data are available.
 
-::: {.callout-tip}
-## Note
-This document provides only the key formatting principles. For a detailed, step-by-step guide on preparing your article and submitting it to Computo, please consult the [guidelines for authors](https://computo-journal.org/site/guidelines-authors.html).
+An additional challenge arises from the heterogeneity of ammonia emission measurements ([@scotto2020review]; [@hafner2025improved]). Field measurements are commonly obtained using either micrometeorological techniques or chamber-based methods. Micrometeorological methods estimate emissions without enclosing the emitting surface and therefore preserve the natural environmental and aerodynamic conditions governing NH$_3$ volatilization. They include several approaches based on different principles, such as eddy covariance, which quantifies turbulent NH$_3$ transport from high-frequency measurements of vertical wind velocity and concentration; aerodynamic gradient methods, which estimate fluxes from vertical concentration gradients and atmospheric turbulence; mass-balance approaches, such as the integrated horizontal flux method; and inverse dispersion modelling, which infers emissions from measured atmospheric concentrations using a dispersion model [@shah2006measuring; @scotto2020review]. These methods are generally considered to provide accurate estimates of emissions because they do not disturb the emission process. However, they often require relatively large experimental areas and substantial instrumentation and logistical effort, making them considerably more expensive to implement and therefore relatively scarce [@shah2006measuring; @scotto2020review; @loubet2021measuring].
+
+Chamber-based methods instead estimate emissions from a confined emitting surface. They can broadly be divided into static chambers, in which NH$_3$ accumulates or is captured without forced air exchange, and dynamic chambers, in which a controlled airflow is imposed through the enclosure [@shah2006measuring; @scotto2020review]. Specific dynamic approaches include wind tunnels, which generate a controlled horizontal airflow over the emitting surface, and the Dräger-Tube Method, which can be combined with passive samplers in the calibrated passive sampling (CPS) approach [@pacholski2006calibration; @pacholski2016calibrated]. Chamber-based measurements can be conducted both in the field and under controlled laboratory conditions, for example using the CaractAir system [@decuq_2024_14170029]. These methods are generally less expensive and allow measurements on smaller experimental units, making chamber-based data usually more abundant [@HUTCHINGS2026147438]. However, they are often considered less representative of field-scale emissions because the enclosure and imposed airflow conditions may alter the environmental and aerodynamic conditions governing NH$_3$ volatilization. This raises a practical question: can field- or laboratory-based chamber measurements improve predictions for conditions where only a limited number of micrometeorological measurements are available?
+
+Transfer learning provides a potential framework for improving predictions for new or poorly documented fertilizer conditions by exploiting information from well-documented ones. In addition to addressing this scarcity of data, transfer learning may provide a way to exploit heterogeneous data collected using different measurement methods. In the present context, the prediction task remains unchanged (predicting ammonia emission dynamics), while the source and target domains differ in fertilizer characteristics. Several strategies can be used to transfer information across domains. Transfer can be performed by directly applying a source-domain model to the target domain without adaptation (zero-shot transfer), by selecting, weighting, or aligning source and target data or representations to account for domain differences, or by adapting model parameters to the target domain through fine-tuning [@pan2009survey; @zhuang2020comprehensive]. Fine-tuning itself may update all model parameters or only selected components, including embeddings, intermediate layers, or lightweight adapter modules [@rebuffi2017learning]. The choice among these strategies depends on the amount and nature of the available data and on the differences between source and target domains. In the present study, we focus on sequential fine-tuning, in which a neural network is first pretrained on available source data and subsequently adapted using a limited number of target observations.
+
+We used data from the ALFAM2 and DetAir databases [@hafner2018alfam2; @hafner2025improved; @decuq_2024_14170029], which contain field and laboratory measurements, respectively. ALFAM2 includes field trials conducted using several measurement methods, including micrometeorological and chamber-based approaches. The different micrometeorological methods were grouped into a single category to ensure a sufficient number of trials, whereas the other field measurement methods were distinguished according to their measurement principle. In addition to these field measurements, DetAir provided laboratory trials conducted using the CaractAir chamber-based method. Overall, the resulting dataset comprised 642 field trials measured using micrometeorological methods, 115 using calibrated passive samplers, 389 using wind tunnels, 127 using other dynamic chambers, and 44 laboratory trials measured using CaractAir.
+
+To evaluate the pretraining and fine-tuning strategy discussed above, fertilizer origin was used to define the source and target domains. Cattle and pig slurries were considered alternately as the target fertilizer origin, while trials from all other fertilizer origins constituted the corresponding source domain. The amount of available target micrometeorological data was artificially restricted to simulate situations representative of emerging or poorly documented fertilizer products. Neural networks were pretrained on source-domain data and fine-tuned using limited target-domain data collected with the different measurement methods described above. Specifically, we addressed three questions: (i) does source-domain pretraining improve predictions when only target micrometeorological trials are available? (ii) does adding target trials collected with a chamber method improve predictions? and (iii) is source-domain pretraining beneficial when chamber-method target trials are available?
+
+# Material and method
+
+## Data
+
+### Data description
+
+The data used in this study were obtained from the ALFAM2 database (version 2.67) ([@hafner2018alfam2]; [@hafner2025improved]) and from the DetAir database [@decuq_2024_14170029; @genermont:hal-03949824]. ALFAM2 contains post-fertilization ammonia emission dynamics collected from 12 countries and 29 research institutes under field conditions using several measurement techniques, including micrometeorological methods and various chamber-based approaches. In contrast, the DetAir data were collected under controlled laboratory conditions. Experimental conditions were kept constant throughout the measurements, with air temperature maintained at $15~^\circ\mathrm{C}$ and airflow fixed at a constant value. In both datasets, cumulative ammonia emissions ($\mathrm{kg\,N{-}NH_3\,ha^{-1}}$) were monitored following fertilizer application.
+
+Each dataset is organized into experiments, which are further divided into treatments. A treatment corresponds to a specific combination of experimental conditions, including fertilizer product, soil characteristics, weather conditions, application method, application rate, and other relevant factors. Each application of a treatment was performed on a distinct experimental unit, hereafter referred to as a plot. A plot therefore corresponds to a field parcel, or its laboratory equivalent, to which fertilizer was applied and for which subsequent ammonia emissions were monitored. Replicates were generally performed for each treatment, although this was not always the case. In the EcoSys dataset, treatments were typically replicated three times, whereas approximately half of the treatments in ALFAM2 were conducted on a single plot.
+
+After dataset-specific preprocessing, the two datasets were merged into a single dataset comprising 1,317 experiment--treatment combinations, 2,635 plots, and 63,669 ammonia emission measurements. Hereafter, each experiment--treatment combination is referred to as a *trial*. The distribution of trials across fertilizer origins and measurement methods was highly unbalanced (Table [-@tbl-number-of-experiments-2]), with the vast majority corresponding to pig and cattle fertilizer origins. Figure [-@fig-data-description] illustrates the distribution of relative ammonia emissions for the different measurement methods.
+
+| Type | Measurement method | Fertilizer origin | Number of trials | Number of plots |
+| --- | --- | --- | ---: | ---: |
+| Field (ALFAM2) | Micromet. | cattle | 438 | 581 |
+| | | pig | 177 | 247 |
+| | | mix | 12 | 13 |
+| | | silage maize | 8 | 8 |
+| | | mineral concentrate | 7 | 13 |
+| | Cps | cattle | 60 | 204 |
+| | | other | 23 | 73 |
+| | | pig | 20 | 63 |
+| | | mix | 8 | 32 |
+| | | mink | 4 | 16 |
+| | Wind tunnel | pig | 202 | 380 |
+| | | cattle | 169 | 434 |
+| | | mix | 18 | 49 |
+| | Dynamic chamber | mix | 90 | 320 |
+| | | cattle | 20 | 41 |
+| | | pig | 17 | 38 |
+| Lab (DetAir) | CaractAir | pig | 17 | 44 |
+| | | cattle | 14 | 40 |
+| | | human | 6 | 18 |
+| | | organic waste | 2 | 6 |
+| | | sewage sludge | 2 | 6 |
+| | | chicken | 1 | 3 |
+| | | fats | 1 | 3 |
+| | | turkey | 1 | 3 |
+
+: Number of trials and plots by experimental type, measurement method, and fertilizer origin. {#tbl-number-of-experiments-2}
+
+```{r}
+#| label: fig-data-description
+#| fig-cap: "Cumulative ammonia emissions over time for different measurement methods. Each curve represents the emission dynamics measured on an individual plot. The y-axis shows cumulative ammonia emissions, and the x-axis indicates time since fertilizer application. Panels represent the different measurement methods."
+#| out-width: "100%"
+
+include_precomputed_figure("fig_1")
+```
+
+**Data Preprocessing**
+
+The complete data preprocessing procedure, including the treatment of missing and non-applicable values, data exclusion criteria, variable recoding, normalization, identification of experiment--treatment combinations, and merging of the ALFAM2 and DetAir datasets, is described in detail in the Appendix.
+
+## Models
+
+We developed several neural network models for ammonia emission prediction, trained on different subsets of the available data, to evaluate a transfer learning strategy based on pretraining and fine-tuning.
+
+### Model architecture
+
+The neural network architecture proposed in Favrot et al. (2026) was implemented in this study, as it previously demonstrated strong predictive performance for ammonia emission dynamics. It consisted of a bidirectional recurrent neural network (RNN) with embedding layers for categorical variables. The hidden state size was set to 512 in each direction, and the ReLU activation function was used throughout the network. The RNN outputs were subsequently passed through a multilayer perceptron (MLP) comprising a single hidden layer of size 6, before producing the prediction of cumulative ammonia emissions.
+
+### Variables considered
+
+The response variable was cumulative ammonia emission at each measurement time, expressed in $\mathrm{kg\,N{-}NH_3\,ha^{-1}}$. A large set of explanatory variables was considered for model development. Application-related variables included application method, incorporation, incorporation depth, incorporation delay, TAN application rate ($\mathrm{kg\,N{-}NH_3\,ha^{-1}}$), and total application rate of the raw material $\mathrm{t\,ha^{-1}}$. Fertilizer-related variables included origin, fertilizer form, treatment types, dry matter content, and pH. Meteorological variables included air temperature, wind speed, and precipitation. Soil-related variables included water content, pH, bulk density, organic matter content, and soil type. Crop-related variables included tillage practice, crop type, and crop height. Additional predictors included the ammonia measurement method, the cumulative time since fertilizer application, and the duration of each measurement interval.
+
+### Notation
+
+We denote by $A$ a target condition corresponding to a specific fertilizer origin, by $E(A)$ the target-domain dataset comprising all trials associated with $A$, and by $\overline{E(A)}$ the source-domain dataset comprising trials associated with fertilizer origins other than $A$. We denote by
+
+$$\mathcal {S} = \{\mathrm{mm}, \mathrm{cps}, \mathrm{wt}, \mathrm{cham}, \mathrm{car}\}$$
+
+the set of measurement methods, corresponding to micrometeorological measurements, calibrated passive samplers, wind tunnels, dynamic chambers, and CaractAir, respectively.
+
+We also define
+
+$$\mathcal{S}^\mathrm{alt}=\mathcal{S}\setminus \{\mathrm{mm}\}$$
+
+and hereafter refer to all measurement methods other than micrometeorological measurements as alternative measurement methods. For each measurement method $x\in\mathcal{S}$, we denote by $x(A)$ the set of trials associated with target $A$ and conducted using measurement method $x$. Hence,
+
+$$E(A) = \bigsqcup_{x\in\mathcal{S}}x(A)$$
+
+We denote by $n_x(A)$ the number of target trials associated with A and measurement method $x$, for $x\in\mathcal{S}$.
+
+We also introduce a partition of $\mathrm{mm}(A)$ into five subsets of trials, where $\mathrm{mm}(A,k)$ denotes the $k$-th subset of this partition, such that the sizes of any two subsets differ by at most one element. These subsets served as test folds in the five-fold cross-validation scheme described below. For $k = 1, \ldots, 5$ and $p = 0, 10, 20, 40, 80$ trials, we define the subsets
+
+$$\mathrm{mm}_{p,k}(A)=
+\begin{cases}
+\varnothing,
+& \mathrm{if\ } p=0\\[1ex]
+\mathrm{a\ random\ sample\ of\ } p\ \mathrm{ elements\ from }
+\displaystyle\bigcup_{i\ne k}\mathrm{mm}(A,i)
+& \mathrm{if\ } p\in\{10,20,40,80\}\\[1ex]
+\end{cases}$$
+
+We also define $$\mathrm{mm}_{\mathrm{all},k} = \displaystyle\bigcup_{i\ne k}\mathrm{mm}(A,i)$$
+
+For simplicity, we use the notation $p = \mathrm{all}$ in tables and figures to refer to $\mathrm{mm}_{\mathrm{all},k}$.
+
+### Transfer learning {#sec-transfer-learning}
+
+We assume that the target $A$ represents a new fertilizer origin for which only limited data are available. To construct predictive models for target $A$, we considered three fine-tuning strategies differing in the data used for pretraining and fine-tuning:
+
+-   pretraining on $\overline{E(A)}$ followed by fine-tuning on $\mathrm{mm}_{p,k}(A)$;
+
+-   pretraining on $\overline{E(A)}$, followed by fine-tuning on $x(A)$ and then on $\mathrm{mm}_{p,k}(A)$, with $x\in\mathcal{S}^{\mathrm{alt}}$;
+
+-   pretraining on $x(A)$ followed by fine-tuning on $\mathrm{mm}_{p,k}(A)$, with $x\in\mathcal{S}^{\mathrm{alt}}$.
+
+Whenever target micrometeorological trials were available, they were used in the last fine-tuning stage. Micrometeorological measurements were treated as the reference because they provide the most reliable estimates of field-scale emissions among the methods considered. The purpose of this final fine-tuning was therefore to obtain a model whose predictions were accurate according to this reference measurement method.
+
+The three strategies represent different data-availability scenarios. The first strategy corresponds to a situation in which only micrometeorological trials are available for target $A$, while trials from other fertilizer origins are used for pretraining. The second and third strategies correspond to situations in which both micrometeorological trials and trials obtained with an alternative measurement method are available for the target. These strategies reflect a practical setting in which a relatively large number of less costly alternative-method trials could be collected, together with a smaller number of more costly but more reliable micrometeorological trials used for final fine-tuning. The second strategy first exploits trials from other fertilizer origins before adapting the model successively to alternative-method and micrometeorological target trials. The third strategy omits pretraining on $\overline{E(A)}$ and starts directly from alternative-method target trials. Comparing the second and third strategies therefore quantifies the added value of pretraining on $\overline{E(A)}$.
+
+Each strategy was considered for $p\in\{0,10,20,40,80\}$, where $p$ denotes the number of target micrometeorological trials available for the final fine-tuning stage. For $p=0$, $\mathrm{mm}_{0,k}(A)=\varnothing$; the final micrometeorological fine-tuning stage was thus skipped, and the model obtained at the end of the preceding stage was retained as the final model.
+
+For each $p>0$, five final models were constructed, one for each test fold $k=1,\ldots,5$, using the corresponding subset $\mathrm{mm}_{p,k}(A)$ for final fine-tuning. For $p=0$, only one model was constructed because no target micrometeorological fine-tuning was performed. Across $p\in\{0,10,20,40,80\}$, the first strategy therefore produced $1+4\times5=21$ final models for each target origin, whereas the second and third strategies each produced 21 final models for every target-origin--alternative-method combination.
+
+Cattle and pig fertilizer origins were considered alternately as target $A$, allowing the three modelling strategies to be investigated under two contrasting target conditions.
+
+Figure [-@fig-transfer-learning] provides a schematic overview of the model construction process corresponding to these strategies.
+
+```{r}
+#| label: fig-transfer-learning
+#| fig-cap: "Transfer learning strategies used to construct models for target fertilizer origin $A$."
+#| fig-align: center
+#| out-width: "100%"
+
+include_precomputed_figure("fig_2")
+```
+
+### Benchmark models {#sec-benchmark-models}
+
+As benchmark models, we considered:
+
+-   models without any source-domain pretraining. These models were trained from the target only, using the subsets $\mathrm{mm}_{p,k}(A)$, $p \in \{ 10,\ 20,\ 40,\ 80,\ \mathrm{all}\}$.
+
+-   constant models equal to the average final emission computed from the subsets $\mathrm{mm}_{p,k}(A)$ for $p \in\{10,\ 20,\ 40,\ 80\}$.
+
+Hereafter, these constant predictors are referred to as target mean models.
+
+Benchmark neural networks trained on $\mathrm{mm}_{\mathrm{all},k}(A)$ provide an estimate of the predictive performance achievable when abundant micrometeorological data are available for target $A$. As previously described, five directly trained neural networks were constructed for each $p\in\{10,20,40,80,\mathrm{all}\}$, one for each $k=1,\ldots,5$. Similarly, five target mean models were constructed for each $p\in\{10,20,40,80\}$ using the corresponding subsets $\mathrm{mm}_{p,k}(A)$. The complete list of models is provided in Table [-@tbl-model-list].
+
+\begingroup
+\footnotesize
+\captionsetup{font=normalsize}
+
+| Training set | First FT set | Second FT set | Model label | $p$ | Architecture | Type |
+| --- | --- | --- | --- | --- | --- | --- |
+| $\overline{E(A)}$ | $\mathrm{mm}_{p,k}(A)$ | – | 1-$\overline{E(A)}$-2-$\mathrm{mm}_p(A)$ | 0, 10, 20, 40, 80 | rnn | TL |
+| $\overline{E(A)}$ | $x(A)$ | $\mathrm{mm}_{p,k}(A)$ | 1-$\overline{E(A)}$-2-$x(A)$-3-$\mathrm{mm}_p(A)$ | 0, 10, 20, 40, 80 | rnn | TL |
+| $x(A)$ | $\mathrm{mm}_{p,k}(A)$ | – | 1-$x(A)$-2-$\mathrm{mm}_p(A)$ | 0, 10, 20, 40, 80 | rnn | TL |
+| $\mathrm{mm}_{p,k}(A)$ | – | – | 1-$\mathrm{mm}_p(A)$ | 10, 20, 40, 80, all | rnn | benchmark |
+| $\mathrm{mm}_{p,k}(A)$ | – | – | mean-model- $\mathrm{mm}_p(A)$ | 10, 20, 40, 80 | mean model | benchmark |
+
+: Overview of the models defined in Sections [-@sec-transfer-learning] and [-@sec-benchmark-models], including their architecture and the training dataset(s) used at each stage of model construction. Model labels are directly derived from the sequence of datasets used during training (training, first fine-tuning and second fine-tuning), with the prefixes 1-, 2- and 3- indicating the corresponding training stage. For simplicity, the index $k$ is omitted from the model labels. For $p\in\{10,20,40,80\}$ (and $p=\mathrm{all}$ where applicable), labels involving $\mathrm{mm}_p(A)$ refer collectively to five distinct models constructed using the subsets $\mathrm{mm}_{p,k}(A)$, one for each $k=1,\ldots,5$. For $p=0$, a single model is constructed because $\mathrm{mm}_{0,k}(A)=\varnothing$ for every $k$; consequently, the corresponding model label denotes a single model independent of $k$. FT and TL denote fine-tuning and transfer learning, respectively. {#tbl-model-list}
+
+\endgroup
+
+### Training-validation procedure
+
+At each training stage (pretraining and fine-tuning), a fraction of the training dataset was set aside for model validation in order to prevent overfitting. The maximum number of epochs was fixed at 1,500, and an early stopping criterion based on the evaluation loss was implemented. Training was stopped when the validation loss failed to decrease for 100 consecutive epochs (patience = 100). The model was trained using the Adam optimizer. The mean squared error was used as the loss function, and optimization was performed using mini-batches of size 32.
+
+When $\overline{E(A)}$ was used as the training set, 30% of the trials were reserved for validation. In all other cases, the validation set size was equal to $\max\left(5,\ 0.15 \times n_{\mathrm{train}}\right)$, where $n_{\mathrm{train}}$ denotes the number of training trials. This ensured that at least 5 trials were available for validation, even in scenarios involving fine-tuning with only $p = 10$ trials. Figure [-@fig-training-procedure] summarizes the overall training procedure.
+
+For fine-tuned models, three parameter update schemes were considered: (i) full fine-tuning, in which all model parameters were updated; (ii) partial fine-tuning, in which only the embedding layers and the post-RNN MLP were updated; and (iii) embedding-only fine-tuning, in which only the embeddings associated with the fertilizer origin variable were updated. For full and partial fine-tuning, a learning rate of $10^{-4}$ was used during both initial training and fine-tuning. For embedding-only fine-tuning, a learning rate of $10^{-4}$ was used during initial training, whereas a learning rate of $2 \times 10^{-3}$ was used during fine-tuning.
+
+```{r}
+#| label: fig-training-procedure
+#| fig-cap: "Training and validation procedure applied at each stage of model construction."
+#| out-width: "100%"
+
+include_precomputed_figure("fig_3")
+```
+
+### Model Evaluation
+
+Model evaluation followed a five-fold cross-validation scheme. For each test fold $\mathrm{mm}(A,k)$, $k=1,\ldots,5$, models using target micrometeorological data were trained or fine-tuned using $\mathrm{mm}_{p,k}(A)$, drawn exclusively from the remaining four folds, and evaluated on $\mathrm{mm}(A,k)$. Models not using target micrometeorological data were likewise evaluated separately on each of the five test folds. Model performance was assessed on final cumulative ammonia emissions using the mean absolute error (MAE).
+
+```{r}
+#| label: fig-model-evaluation
+#| fig-cap: "Independent evaluation procedure for models with and without fine-tuning on target micrometeorological data."
+#| out-width: "100%"
+
+include_precomputed_figure("fig_4")
+```
+
+The complete five-fold cross-validation scheme was repeated 10 times using a different random seed for each repetition. At each repetition, the target micrometeorological trials were repartitioned into five folds, the subsets of $p$ target trials were resampled, and all training--validation splits for the source-domain, alternative-method, and target micrometeorological datasets were redrawn. The neural-network architecture, hyperparameters, model-initialization seed, and mini-batch shuffling seed were kept fixed across repetitions.
+
+Within each repetition, the MAEs obtained on the five test folds were averaged, yielding one MAE estimate per model configuration and repetition. Each model configuration was therefore represented by 10 MAE values. The 50 individual fold-level MAEs were also retained to describe variability among test folds and across repetitions.
+
+# Results
+
+```{r}
+#| label: prepare-full-data
+#| include: false
+
+df_res1_folds = read.csv (file = file.path(results_directory, "df_res_1.csv"))
+
+df_res1 = df_res1_folds %>%
+    summarise (
+        mae = mean (mae),
+        .by = c (
+            strategy, source_domain, alternative_data,
+            target_mm_data, p, repetition
+        )
+    )
+
+df_res1_ref = df_res1 %>%
+    filter (strategy == "target_mm_only" & p == "all")
+
+MAE_ref = df_res1_ref %>%
+    summarise (MAE = mean (mae), .by = target_mm_data)
+
+plot_data = df_res1 %>%
+    filter (! (strategy == "target_mm_only" & p == "all"))
+
+
+df1 = plot_data %>%
+    filter (strategy %in% c (
+        "source_to_alternative_to_target_mm",
+        "alternative_to_target_mm"
+    )) %>%
+    mutate (origin = recode (
+        target_mm_data,
+        "micro_met_cat" = "cat",
+        "micro_met_pig" = "pig"
+    )) %>%
+    mutate (alternative_method = recode (
+        alternative_data,
+        "CaractAir_cat" = "CaractAir", "CaractAir_pig" = "CaractAir",
+        "chamber_cat" = "chamber", "chamber_pig" = "chamber",
+        "cps_cat" = "cps", "cps_pig" = "cps",
+        "wt_pig" = "wt", "wt_cat" = "wt"
+    ))
+
+
+df2 = plot_data %>%
+    filter (strategy %in% c (
+        "source_to_target_mm",
+        "target_mm_only",
+        "target_mean"
+    )) %>%
+    mutate (origin = recode (
+        target_mm_data,
+        "micro_met_cat" = "cat",
+        "micro_met_pig" = "pig"
+    )) %>%
+    cross_join (data.frame (
+        alternative_method = c ("CaractAir", "chamber", "cps", "wt")
+    ))
+
+
+df = rbind (df1, df2)
+
+MAE_cat = MAE_ref %>%
+    filter (target_mm_data == "micro_met_cat") %>%
+    pull (MAE)
+MAE_pig = MAE_ref %>%
+    filter (target_mm_data == "micro_met_pig") %>%
+    pull (MAE)
+
+
+df_hline_full = data.frame (
+    origin = c ("cat", "pig"),
+    yintercept = c (MAE_cat, MAE_pig)
+) %>%
+    mutate (origin = recode (
+        origin,
+        "cat" = "A = Cattle",
+        "pig" = "A = Pig"
+    )) %>%
+    mutate (origin = factor (
+        origin,
+        levels = c ("A = Cattle", "A = Pig")
+    ))
+
+
+df_plot_full = df %>%
+    mutate (Model = factor (strategy, levels = c (
+        "source_to_target_mm",
+        "source_to_alternative_to_target_mm",
+        "alternative_to_target_mm",
+        "target_mm_only",
+        "target_mean"
+    ))) %>%
+    mutate (origin = recode (
+        origin,
+        "cat" = "A = Cattle",
+        "pig" = "A = Pig"
+    )) %>%
+    mutate (origin = factor (
+        origin,
+        levels = c ("A = Cattle", "A = Pig")
+    )) %>%
+    mutate (alternative_method = recode (
+        alternative_method,
+        "CaractAir" = "x = CaractAir",
+        "wt" = "x = Wind tunnel",
+        "chamber" = "x = Dyn. chamber",
+        "cps" = "x = Cps"
+    )) %>%
+    mutate (alternative_method = factor (
+        alternative_method,
+        levels = c ("x = Cps", "x = Wind tunnel", "x = Dyn. chamber", "x = CaractAir")
+    ))
+
+df_plot_folds_full = df_plot_full %>%
+    select (-mae) %>%
+    left_join (
+        df_res1_folds,
+        by = c (
+            "strategy", "source_domain", "alternative_data",
+            "target_mm_data", "p", "repetition"
+        ),
+        relationship = "many-to-many"
+    )
+```
+
+```{r}
+#| label: prepare-partial-data
+#| include: false
+
+df_res2_folds = read.csv (file = file.path(results_directory, "df_res_2.csv"))
+
+df_res2 = df_res2_folds %>%
+    summarise (
+        mae = mean (mae),
+        .by = c (
+            strategy, source_domain, alternative_data,
+            target_mm_data, p, repetition
+        )
+    )
+
+df_res2_ref = df_res2 %>%
+    filter (strategy == "target_mm_only" & p == "all")
+
+MAE_ref = df_res2_ref %>%
+    summarise (MAE = mean (mae), .by = target_mm_data)
+
+plot_data = df_res2 %>%
+    filter (! (strategy == "target_mm_only" & p == "all"))
+
+
+df1 = plot_data %>%
+    filter (strategy %in% c (
+        "source_to_alternative_to_target_mm",
+        "alternative_to_target_mm"
+    )) %>%
+    mutate (origin = recode (
+        target_mm_data,
+        "micro_met_cat" = "cat",
+        "micro_met_pig" = "pig"
+    )) %>%
+    mutate (alternative_method = recode (
+        alternative_data,
+        "CaractAir_cat" = "CaractAir", "CaractAir_pig" = "CaractAir",
+        "chamber_cat" = "chamber", "chamber_pig" = "chamber",
+        "cps_cat" = "cps", "cps_pig" = "cps",
+        "wt_pig" = "wt", "wt_cat" = "wt"
+    ))
+
+
+df2 = plot_data %>%
+    filter (strategy %in% c (
+        "source_to_target_mm",
+        "target_mm_only",
+        "target_mean"
+    )) %>%
+    mutate (origin = recode (
+        target_mm_data,
+        "micro_met_cat" = "cat",
+        "micro_met_pig" = "pig"
+    )) %>%
+    cross_join (data.frame (
+        alternative_method = c ("CaractAir", "chamber", "cps", "wt")
+    ))
+
+
+df = rbind (df1, df2)
+
+MAE_cat = MAE_ref %>%
+    filter (target_mm_data == "micro_met_cat") %>%
+    pull (MAE)
+MAE_pig = MAE_ref %>%
+    filter (target_mm_data == "micro_met_pig") %>%
+    pull (MAE)
+
+
+df_hline_partial = data.frame (
+    origin = c ("cat", "pig"),
+    yintercept = c (MAE_cat, MAE_pig)
+) %>%
+    mutate (origin = recode (
+        origin,
+        "cat" = "A = Cattle",
+        "pig" = "A = Pig"
+    )) %>%
+    mutate (origin = factor (
+        origin,
+        levels = c ("A = Cattle", "A = Pig")
+    ))
+
+
+df_plot_partial = df %>%
+    mutate (Model = factor (strategy, levels = c (
+        "source_to_target_mm",
+        "source_to_alternative_to_target_mm",
+        "alternative_to_target_mm",
+        "target_mm_only",
+        "target_mean"
+    ))) %>%
+    mutate (origin = recode (
+        origin,
+        "cat" = "A = Cattle",
+        "pig" = "A = Pig"
+    )) %>%
+    mutate (origin = factor (
+        origin,
+        levels = c ("A = Cattle", "A = Pig")
+    )) %>%
+    mutate (alternative_method = recode (
+        alternative_method,
+        "CaractAir" = "x = CaractAir",
+        "wt" = "x = Wind tunnel",
+        "chamber" = "x = Dyn. chamber",
+        "cps" = "x = Cps"
+    )) %>%
+    mutate (alternative_method = factor (
+        alternative_method,
+        levels = c ("x = Cps", "x = Wind tunnel", "x = Dyn. chamber", "x = CaractAir")
+    ))
+
+df_plot_folds_partial = df_plot_partial %>%
+    select (-mae) %>%
+    left_join (
+        df_res2_folds,
+        by = c (
+            "strategy", "source_domain", "alternative_data",
+            "target_mm_data", "p", "repetition"
+        ),
+        relationship = "many-to-many"
+    )
+```
+
+```{r}
+#| label: prepare-embedding-data
+#| include: false
+
+df_res3_folds = read.csv (file = file.path(results_directory, "df_res_3.csv"))
+
+df_res3 = df_res3_folds %>%
+    summarise (
+        mae = mean (mae),
+        .by = c (
+            strategy, source_domain, alternative_data,
+            target_mm_data, p, repetition
+        )
+    )
+
+df_res3_ref = df_res3 %>%
+    filter (strategy == "target_mm_only" & p == "all")
+
+MAE_ref = df_res3_ref %>%
+    summarise (MAE = mean (mae), .by = target_mm_data)
+
+plot_data = df_res3 %>%
+    filter (! (strategy == "target_mm_only" & p == "all"))
+
+
+df1 = plot_data %>%
+    filter (strategy %in% c (
+        "source_to_alternative_to_target_mm",
+        "alternative_to_target_mm"
+    )) %>%
+    mutate (origin = recode (
+        target_mm_data,
+        "micro_met_cat" = "cat",
+        "micro_met_pig" = "pig"
+    )) %>%
+    mutate (alternative_method = recode (
+        alternative_data,
+        "CaractAir_cat" = "CaractAir", "CaractAir_pig" = "CaractAir",
+        "chamber_cat" = "chamber", "chamber_pig" = "chamber",
+        "cps_cat" = "cps", "cps_pig" = "cps",
+        "wt_pig" = "wt", "wt_cat" = "wt"
+    ))
+
+
+df2 = plot_data %>%
+    filter (strategy %in% c (
+        "source_to_target_mm",
+        "target_mm_only",
+        "target_mean"
+    )) %>%
+    mutate (origin = recode (
+        target_mm_data,
+        "micro_met_cat" = "cat",
+        "micro_met_pig" = "pig"
+    )) %>%
+    cross_join (data.frame (
+        alternative_method = c ("CaractAir", "chamber", "cps", "wt")
+    ))
+
+
+df = rbind (df1, df2)
+
+MAE_cat = MAE_ref %>%
+    filter (target_mm_data == "micro_met_cat") %>%
+    pull (MAE)
+MAE_pig = MAE_ref %>%
+    filter (target_mm_data == "micro_met_pig") %>%
+    pull (MAE)
+
+
+df_hline_embedding = data.frame (
+    origin = c ("cat", "pig"),
+    yintercept = c (MAE_cat, MAE_pig)
+) %>%
+    mutate (origin = recode (
+        origin,
+        "cat" = "A = Cattle",
+        "pig" = "A = Pig"
+    )) %>%
+    mutate (origin = factor (
+        origin,
+        levels = c ("A = Cattle", "A = Pig")
+    ))
+
+
+df_plot_embedding = df %>%
+    mutate (Model = factor (strategy, levels = c (
+        "source_to_target_mm",
+        "source_to_alternative_to_target_mm",
+        "alternative_to_target_mm",
+        "target_mm_only",
+        "target_mean"
+    ))) %>%
+    mutate (origin = recode (
+        origin,
+        "cat" = "A = Cattle",
+        "pig" = "A = Pig"
+    )) %>%
+    mutate (origin = factor (
+        origin,
+        levels = c ("A = Cattle", "A = Pig")
+    )) %>%
+    mutate (alternative_method = recode (
+        alternative_method,
+        "CaractAir" = "x = CaractAir",
+        "wt" = "x = Wind tunnel",
+        "chamber" = "x = Dyn. chamber",
+        "cps" = "x = Cps"
+    )) %>%
+    mutate (alternative_method = factor (
+        alternative_method,
+        levels = c ("x = Cps", "x = Wind tunnel", "x = Dyn. chamber", "x = CaractAir")
+    ))
+
+df_plot_folds_embedding = df_plot_embedding %>%
+    select (-mae) %>%
+    left_join (
+        df_res3_folds,
+        by = c (
+            "strategy", "source_domain", "alternative_data",
+            "target_mm_data", "p", "repetition"
+        ),
+        relationship = "many-to-many"
+    )
+```
+
+
+The results presented in the main text correspond to full fine-tuning, in which all model parameters were updated. For strategies involving an alternative measurement method, the main figures focus on CaractAir and wind tunnel trials; results obtained with dynamic chamber and calibrated passive sampler trials are provided in the Appendix (@suppfig-transfer-ft1-cps-and-chamber). Results for partial fine-tuning, which updates the embeddings and post-RNN MLP, and for fertilizer-origin-embedding-only fine-tuning are provided in the Appendix (@suppfig-transfer-ft2-all-methods and @suppfig-transfer-ft3-all-methods). Unless otherwise stated, numerical comparisons refer to the median of the 10 repetition-level MAEs, each obtained by averaging the five test-fold MAEs.
+
+## Does source-domain pretraining improve models when only target micrometeorological trials are available?
+
+We first considered the strategy in which a model pretrained on $\overline{E(A)}$ was fine-tuned using only target micrometeorological trials. Its performance was compared with that of neural networks trained directly on the same target trials and with the target mean-model benchmark (Figure [-@fig-res-1-1]).
+
+```{r}
+#| label: fig-res-1-1
+#| dependson: prepare-full-data
+#| fig-cap: "Performance of source-pretrained models fine-tuned using only target micrometeorological trials. MAEs are shown for the transfer-learning model 1-$\\overline{E(A)}$-2-$\\mathrm{mm}_p(A)$ and the benchmark models 1-$\\mathrm{mm}_p(A)$ and mean-model-$\\mathrm{mm}_p(A)$. Fine-tuning was performed by updating all model parameters. Boxplots show the distribution of the 10 repetition-level MAEs, each computed as the mean of the five test-fold MAEs. The dashed horizontal line indicates the mean MAE of the target-only neural-network benchmark trained using all non-test target micrometeorological trials, computed over all repetitions and folds."
+#| fig-width: 14
+#| fig-height: 6
+#| out-width: "100%"
+
+# ---------------------------------------------------------------------
+### Figure 5
+
+fig_5 = df_plot_full %>%
+    filter (alternative_method %in% c ("x = CaractAir")) %>%
+    filter (Model %in% c ("source_to_target_mm", "target_mm_only", "target_mean")) %>%
+    ggplot () +
+        geom_boxplot (aes (x = p, y = mae, fill = Model), outlier.alpha = 0.45) +
+        geom_hline(
+            data = df_hline_full,
+            aes(yintercept = yintercept),
+            linewidth = 0.8,
+            linetype = 2
+        ) +
+        facet_grid (~ origin, scales = "free_y") +
+        scale_fill_manual (values = c ("source_to_target_mm" = Dark2[2],
+                                        "target_mm_only" = "#A6CEE3",
+                                        "target_mean" = "#1F78B4"),
+                           breaks = c ("source_to_target_mm", "target_mm_only", "target_mean"),
+                           labels = expression (paste ("1-", bar (E(A)), "-2-", plain(mm)[italic(p)], "(A)"),
+                                                paste ("1-", plain(mm)[italic(p)], "(A)"),
+                                                paste ("mean-model-", plain(mm)[italic(p)], "(A)"))) +
+        xlab ("p") +
+        ylab (expression("MAE (kg N-" * plain(NH)[3] * " ha"^{-1} * ")"))
+
+fig_5
+```
+
+At $p=0$, source-pretrained models had median MAEs of 10.42 and 13.03 $\mathrm{kg\,N{-}NH_3\,ha^{-1}}$ for cattle and pig, respectively. For every positive value of $p$ considered, source-domain pretraining followed by fine-tuning yielded a lower median MAE than training the network directly on the target trials. At $p=10$, the median MAE decreased from 11.86 to 10.07 for cattle and from 17.19 to 12.90 for pig.
+
+Prediction errors generally decreased as $p$ increased. For cattle, the source-pretrained network had median MAEs of 8.91, 8.28, and 7.26 at $p=20$, 40, and 80, compared with 9.93, 8.94, and 8.13 for the directly trained network. Nevertheless, the target mean model performed better at $p=10$ and 20, with median MAEs of 8.36 and 8.15, and was nearly equivalent to the source-pretrained network at $p=40$ (8.22 versus 8.28). The source-pretrained network outperformed both benchmarks at $p=80$. For pig, it outperformed both benchmarks at all positive values of $p$: its median MAEs were 11.69, 10.39, and 9.82 at $p=20$, 40, and 80, whereas those of the directly trained network were 14.69, 12.13, and 10.70. The advantage over direct neural-network training thus persisted across the sample sizes examined, although its magnitude generally decreased as more target trials became available.
+
+## Does adding target trials from an alternative measurement method improve prediction?
+
+We next assessed whether target trials obtained with an alternative measurement method provided additional information beyond source-domain pretraining and target micrometeorological trials. For CaractAir and wind tunnel data, Figure [-@fig-res-1-2] directly compares models successively trained on $\overline{E(A)}$, $x(A)$, and $\mathrm{mm}_{p,k}(A)$ with models in which the intermediate fine-tuning stage on $x(A)$ was omitted. The benchmark models provide additional context for interpreting their predictive performance.
+
+```{r}
+#| label: fig-res-1-2
+#| dependson: prepare-full-data
+#| fig-cap: "Effect of adding alternative-method target trials after source-domain pretraining. MAEs are shown for 1-$\\overline{E(A)}$-2-$x(A)$-3-$\\mathrm{mm}_p(A)$, 1-$\\overline{E(A)}$-2-$\\mathrm{mm}_p(A)$, and the benchmark models 1-$\\mathrm{mm}_p(A)$ and mean-model-$\\mathrm{mm}_p(A)$, with $x$ corresponding to wind tunnel or CaractAir measurements. All model parameters were updated during fine-tuning. Boxplots show the distribution of the 10 repetition-level MAEs, each computed as the mean of the five test-fold MAEs. The dashed horizontal line indicates the mean MAE of the target-only neural-network benchmark trained using all non-test target micrometeorological trials, computed over all repetitions and folds. The y-axis is logarithmic and the displayed range is capped at a MAE of 25. Upward arrows identify values beyond this range, with their MAEs shown above the arrows."
+#| fig-width: 14
+#| fig-height: 10
+#| out-width: "100%"
+
+# ---------------------------------------------------------------------
+### Figure 6
+
+df_arrows_fig_6 = df_plot_full %>%
+    filter (
+        alternative_method == "x = Wind tunnel",
+        Model == "source_to_alternative_to_target_mm"
+    ) %>%
+    summarise (
+        hidden_mae = max (mae),
+        box_upper = max (mae[
+            mae <= quantile (mae, 0.75) + 1.5 * IQR (mae)
+        ]),
+        .by = c (origin, alternative_method, Model, p)
+    ) %>%
+    filter (hidden_mae > 25) %>%
+    mutate (
+        label = paste0 (round (hidden_mae, 1), "\n\u2191"),
+        label_y = box_upper * 1.14
+    )
+
+fig_6 = df_plot_full %>%
+    filter (alternative_method %in% c ("x = CaractAir", "x = Wind tunnel")) %>%
+    filter (Model %in% c ("source_to_target_mm", "source_to_alternative_to_target_mm", "target_mm_only", "target_mean")) %>%
+    ggplot () +
+        geom_boxplot (aes (x = p, y = mae, fill = Model), outlier.alpha = 0.45) +
+        geom_hline(
+            data = df_hline_full,
+            aes(yintercept = yintercept),
+            linewidth = 0.8,
+            linetype = 2
+        ) +
+        geom_text (
+            data = df_arrows_fig_6,
+            aes (x = p, y = label_y, label = label),
+            position = position_nudge (x = 0.19),
+            inherit.aes = FALSE,
+            size = 4
+        ) +
+        facet_grid (alternative_method ~ origin, scales = "free_y") +
+        scale_y_log10 () +
+        coord_cartesian (ylim = c (NA, 25)) +
+        scale_fill_manual (values = c ("source_to_target_mm" = Dark2[2],
+                                       "source_to_alternative_to_target_mm" = "#F28E2B",
+                                       "target_mm_only" = "#A6CEE3",
+                                       "target_mean" = "#1F78B4"),
+                           breaks = c ("source_to_target_mm", "source_to_alternative_to_target_mm", "target_mm_only", "target_mean"),
+                           labels = expression (paste ("1-", bar (E(A)), "-2-", plain(mm)[italic(p)], "(A)"),
+                                                paste ("1-", bar (E(A)), "-2-x(A)-3-", plain(mm)[italic(p)], "(A)"),
+                                                paste ("1-", plain(mm)[italic(p)], "(A)"),
+                                                paste ("mean-model-", plain(mm)[italic(p)], "(A)"))) +
+        xlab ("p") +
+        ylab (expression("MAE (kg N-" * plain(NH)[3] * " ha"^{-1} * ")"))
+
+fig_6
+```
+
+In the absence of target micrometeorological trials ($p=0$), adding CaractAir fine-tuning changed the median MAE from 10.42 to 10.70 for cattle and from 13.03 to 14.72 for pig. Wind tunnel fine-tuning produced a small decrease for cattle (10.42 to 10.21) but an increase for pig (13.03 to 16.99). Some repetitions also produced high errors, including a MAE of 45.41 for cattle with wind tunnel fine-tuning. Alternative-method adaptation without subsequent target micrometeorological fine-tuning therefore did not provide a consistent improvement.
+
+For cattle and $p>0$, both CaractAir and wind tunnel intermediate fine-tuning yielded modest reductions in median MAE relative to direct source-to-target fine-tuning. At $p=10$, the median decreased from 10.07 to 9.94 with CaractAir and to 9.63 with wind tunnel. At $p=40$, the corresponding medians were 8.28, 7.99, and 8.19, showing that the method providing the larger improvement varied with target sample size. For pig, the intermediate stage increased median MAE at all positive values of $p$ for both methods. This increase was most pronounced with wind tunnel data at low $p$ (16.36 versus 12.90 at $p=10$) and was smaller at $p=80$ (10.00 versus 9.82).
+
+The additional methods showed a similar dependence on the target origin (@suppfig-transfer-ft1-cps-and-chamber). For cattle, dynamic chamber intermediate fine-tuning modestly improved median performance at all positive values of $p$, whereas calibrated passive sampler fine-tuning increased errors at $p=10$ and 20 and had little effect at larger $p$. For pig, both methods generally increased median errors relative to direct source-to-target fine-tuning; the very small improvement with calibrated passive samplers at $p=40$ was an exception.
+
+## Is source-domain pretraining beneficial when alternative-method target trials are available?
+
+Finally, we assessed whether source-domain pretraining remained beneficial when alternative-method target trials were available. Figure [-@fig-res-1-3] directly compares models successively trained on $\overline{E(A)}$, $x(A)$, and $\mathrm{mm}_{p,k}(A)$ with models trained only on $x(A)$ before micrometeorological fine-tuning. This comparison isolates the contribution of the initial pretraining stage on $\overline{E(A)}$.
+
+```{r}
+#| label: fig-res-1-3
+#| dependson: prepare-full-data
+#| fig-cap: "Effect of source-domain pretraining when alternative-method target trials are available. MAEs are shown for 1-$\\overline{E(A)}$-2-$x(A)$-3-$\\mathrm{mm}_p(A)$, 1-$x(A)$-2-$\\mathrm{mm}_p(A)$, and the benchmark models 1-$\\mathrm{mm}_p(A)$ and mean-model-$\\mathrm{mm}_p(A)$, with $x$ corresponding to wind tunnel or CaractAir measurements. All model parameters were updated during fine-tuning. Boxplots show the distribution of the 10 repetition-level MAEs, each computed as the mean of the five test-fold MAEs. The dashed horizontal line indicates the mean MAE of the target-only neural-network benchmark trained using all non-test target micrometeorological trials, computed over all repetitions and folds. The y-axis is logarithmic and the displayed range is capped at a MAE of 38. Arrow annotations list the upper outliers of the affected boxplots, including a value below the cap, in place of their individual points."
+#| fig-width: 14
+#| fig-height: 10
+#| out-width: "100%"
+
+# ---------------------------------------------------------------------
+### Figure 7
+
+df_arrows_fig_7 = df_plot_full %>%
+    filter (
+        alternative_method %in% c ("x = CaractAir", "x = Wind tunnel"),
+        Model %in% c (
+            "source_to_alternative_to_target_mm",
+            "alternative_to_target_mm"
+        )
+    ) %>%
+    summarise (
+        hidden_mae = max (mae),
+        upper_fence = quantile (mae, 0.75) + 1.5 * IQR (mae),
+        box_upper = max (mae[
+            mae <= upper_fence
+        ]),
+        outlier_label = paste (
+            round (sort (mae[mae > upper_fence], decreasing = TRUE), 1),
+            collapse = "\n"
+        ),
+        .by = c (origin, alternative_method, Model, p)
+    ) %>%
+    filter (hidden_mae > 38) %>%
+    mutate (
+        label = paste0 (outlier_label, "\n\u2191"),
+        label_y = box_upper * 1.18
+    )
+
+df_hidden_outlier_fig_7 = df_plot_full %>%
+    filter (
+        alternative_method == "x = CaractAir",
+        origin == "A = Pig",
+        Model == "alternative_to_target_mm",
+        p == "0"
+    ) %>%
+    mutate (
+        upper_fence = quantile (mae, 0.75) + 1.5 * IQR (mae)
+    ) %>%
+    filter (mae > upper_fence, mae <= 38)
+
+fig_7 = df_plot_full %>%
+    filter (alternative_method %in% c ("x = CaractAir", "x = Wind tunnel")) %>%
+    filter (Model %in% c ("source_to_alternative_to_target_mm", "alternative_to_target_mm", "target_mm_only", "target_mean")) %>%
+    ggplot () +
+        geom_boxplot (aes (x = p, y = mae, fill = Model), outlier.alpha = 0.45) +
+        geom_hline(
+            data = df_hline_full,
+            aes(yintercept = yintercept),
+            linewidth = 0.8,
+            linetype = 2
+        ) +
+        geom_point (
+            data = df_hidden_outlier_fig_7,
+            aes (x = p, y = mae),
+            position = position_nudge (x = 0.19),
+            colour = "#f3faff",
+            size = 2.5,
+            inherit.aes = FALSE
+        ) +
+        geom_text (
+            data = df_arrows_fig_7 %>%
+                filter (Model == "source_to_alternative_to_target_mm"),
+            aes (x = p, y = label_y, label = label),
+            position = position_nudge (x = -0.18),
+            inherit.aes = FALSE,
+            size = 4
+        ) +
+        geom_text (
+            data = df_arrows_fig_7 %>%
+                filter (Model == "alternative_to_target_mm"),
+            aes (x = p, y = label_y * 1.05, label = label),
+            position = position_nudge (x = 0.19),
+            inherit.aes = FALSE,
+            size = 4
+        ) +
+        facet_grid (alternative_method ~ origin, scales = "free_y") +
+        scale_fill_manual (values = c ("source_to_alternative_to_target_mm" = "#F28E2B",
+                                       "alternative_to_target_mm" = "#FBBF77",
+                                       "target_mm_only" = "#A6CEE3",
+                                       "target_mean" = "#1F78B4"),
+                           breaks = c ("source_to_alternative_to_target_mm", "alternative_to_target_mm", "target_mm_only", "target_mean"),
+                           labels = expression (paste ("1-", bar (E(A)), "-2-x(A)-3-", plain(mm)[italic(p)], "(A)"),
+                                                paste ("1-x(A)-2-", plain(mm)[italic(p)], "(A)"),
+                                                paste ("1-", plain(mm)[italic(p)], "(A)"),
+                                                paste ("mean-model-", plain(mm)[italic(p)], "(A)"))) +
+        scale_y_log10 () +
+        coord_cartesian (ylim = c (NA, 38)) +
+        xlab ("p") +
+        ylab (expression("MAE (kg N-" * plain(NH)[3] * " ha"^{-1} * ")"))
+
+fig_7
+```
+
+At $p=0$, models trained only on alternative-method target trials had markedly higher median MAEs than their source-pretrained counterparts. For cattle, the medians were 22.11 versus 10.70 with CaractAir and 20.67 versus 10.21 with wind tunnel. For pig, they were 21.07 versus 14.72 and 29.30 versus 16.99, respectively. The source pretraining stage thus substantially improved median performance before any adaptation to target micrometeorological trials.
+
+For all positive values of $p$ represented in Figure [-@fig-res-1-3], the sequential strategy retained a lower median MAE than pretraining only on the alternative-method trials. However, the magnitude of this advantage depended on the origin, method, and target sample size. At $p=10$, CaractAir medians were 9.94 versus 12.04 for cattle and 13.19 versus 17.24 for pig, with and without source pretraining, respectively. With wind tunnel data, the corresponding cattle medians were almost identical (9.63 versus 9.66), whereas the pig medians were 16.36 versus 18.18. Alternative-method-only pretraining could still improve on direct target-only training: for example, cattle--wind tunnel MAEs were 8.68 versus 9.93 at $p=20$. These results indicate that alternative-method data can provide useful initialization, but did not fully replace source-domain pretraining in the CaractAir and wind tunnel comparisons.
+
+## Sensitivity to the parameter-update scheme
+
+Restricting fine-tuning to the embeddings and post-RNN MLP did not provide a general improvement over full fine-tuning (@suppfig-transfer-ft2-all-methods). Direct source-to-target partial fine-tuning retained lower median MAEs than target-only neural-network training at all positive values of $p$ for both origins. However, the effect of intermediate alternative-method fine-tuning depended on the update scheme. For cattle with wind tunnel data, sequential partial fine-tuning increased median MAE relative to direct source-to-target partial fine-tuning at all four positive values of $p$, in contrast to the modest improvements observed with full fine-tuning. At $p=10$, the medians were 11.38 versus 10.02 under partial fine-tuning, compared with 9.63 versus 10.07 under full fine-tuning.
+
+Updating only the fertilizer-origin embedding produced much smaller improvements as more target trials became available (@suppfig-transfer-ft3-all-methods). For direct source-to-target adaptation, the median cattle MAE changed from 10.45 at $p=10$ to 10.22 at $p=80$, compared with 10.07 and 7.26 under full fine-tuning. For pig, the corresponding embedding-only medians were 12.88 and 12.35, compared with 12.90 and 9.82 under full fine-tuning. Embedding-only adaptation could thus remain competitive at the smallest sample size, but benefited much less from additional target trials. At $p=80$, direct embedding-only transfer also had higher median errors than target-only neural-network training for both origins.
+
+# Discussion
+
+The main finding of this study is that source-domain pretraining followed by fine-tuning improved median predictive performance relative to training the same neural network directly on the available target micrometeorological trials. Under full fine-tuning, this advantage was observed for both cattle and pig at all four positive target sample sizes examined. Its practical value nevertheless depended on the benchmark: for cattle with few target trials, a simple target mean predictor remained competitive or better. Thus, improving a neural network through transfer learning does not necessarily make it preferable to a simpler predictor in every data-limited setting.
+
+The three comparisons distinguish the value of source-domain pretraining from that of an additional adaptation stage. Source pretraining produced a regular median advantage over direct target-only neural-network training. Adding alternative-method target trials to this pretrained model had smaller and less consistent effects: gains were generally modest for cattle, while errors tended to increase for pig. Finally, pretraining only on CaractAir or wind tunnel trials was less effective than the sequential strategy in median terms, although the two could become nearly equivalent and alternative-method-only pretraining could itself outperform target-only training. These findings suggest that source data provide useful transferable information, but that introducing an additional measurement domain does not necessarily improve predictive performance.
+
+Differences between source and target domains may help explain variation in transfer benefits [@zhang2022survey]. Fertilizer origin is associated with differences in physicochemical properties, including pH, dry matter content, and total ammoniacal nitrogen. Soil pH and soil bulk density also differed between the source and target datasets (@suppfig-fer-characteristics-cattle-vs-non-cattle and @suppfig-fer-characteristics-pig-vs-non-pigs). Despite these discrepancies, the source data supported beneficial initialization relative to target-only neural-network training. For pig, final cumulative emissions were more dispersed (@suppfig-variability-of-emissions), and the target mean predictor had larger average absolute deviations from the observed emissions than for cattle. A constant predictor assigns the same prediction to every target plot and therefore cannot account for differences among plots. The lower errors of the source-pretrained networks for pig indicate that accounting for plot-specific predictors improved predictive performance relative to this constant benchmark.
+
+Several factors should be considered when interpreting the results obtained with alternative measurement methods. The numbers of available target trials differed substantially among CaractAir, wind tunnel, dynamic chamber, and calibrated passive sampler datasets. These datasets also differed in their fertilizer, soil, weather, and management conditions. Consequently, comparisons among alternative measurement methods reflect differences in both measurement techniques and dataset size and composition. Moreover, the marginal distributions of final cumulative emissions were broadly similar across measurement methods (@suppfig-final-cumulative-emissions-by-measurement-methods), but this comparison does not control for differences in fertilizer origins and experimental conditions. The present results therefore do not allow the intrinsic usefulness of each measurement method for transfer learning to be separated completely from the characteristics of the corresponding dataset. Further investigations based on larger or more closely matched datasets would be needed to distinguish these effects.
+
+Measurement-domain heterogeneity may also remain within the broad categories used in this study. Chamber-based measurements were separated into wind tunnel, dynamic chamber, calibrated passive sampler, and CaractAir datasets, whereas the different micrometeorological methods were grouped into a single reference category. This aggregation was necessary to retain enough micrometeorological trials for target fine-tuning and independent evaluation, but it assumes that differences among micrometeorological methods are negligible relative to those between micrometeorological and chamber-based methods. More finely resolved measurement domains could reveal technique-specific differences in measurement uncertainty, temporal resolution, or relationships between predictors and observed emissions. Future studies could therefore evaluate transfer among micrometeorological methods or use a shared representations combined with method-specific model components.
+
+Cattle and pig fertilizer origins were considered in turn as target conditions. They were selected because the relatively large number of micrometeorological trials available for both origins made it possible to simulate situations of limited target-data availability while retaining independent trials for model evaluation. Although they are not emerging fertilizer products, the experimental setting reproduces the statistical situation that would arise for a new fertilizer origin for which only a small number of reliable measurements were available. The median improvements for both target origins support the usefulness of source-domain pretraining in these simulated data-limited settings, but they do not establish that the same gains will occur for emerging fertilizer products. Evaluating additional fertilizer origins would help establish how broadly these findings generalize.
+
+The definition of source and target domains may influence transfer performance. Although fertilizer origin was used to retain sufficient data for independent evaluation, combining origin and physical form could define more homogeneous targets. For example, treating solid cattle manure as the target while retaining cattle slurry in the source could increase source--target similarity and improve transfer, but finer categories would also reduce sample sizes, particularly because fertilizer form was not consistently reported in the data.
+
+Other methodological choices may also have influenced the observed performance. All strategies were based on a single neural-network architecture and a common hyperparameter configuration inherited from Favrot et al. (2026), where they had shown strong predictive performance for ammonia emission dynamics. Holding these choices fixed facilitated comparison of the transfer strategies, but does not establish that any strategy was individually optimized. Partial fine-tuning did not yield a general improvement over full fine-tuning, and the cattle--wind tunnel comparison showed that restricting parameter updates could reverse the effect of the intermediate adaptation stage. Restricting updates further to the fertilizer-origin embedding yielded little improvement with increasing target sample size. Within this architecture, updating the origin embedding alone was insufficient to obtain the reductions in error observed when the full network was adapted. Conclusions about transfer therefore depend partly on how the model is allowed to adapt. Other architectures, regularization approaches, or training hyperparameters may change these effects.
+
+To assess sensitivity to data partitioning, the complete partitioning procedure was repeated 10 times, including target micrometeorological folds and subsamples and source-domain and alternative-method training--validation splits. The main boxplots summarize repetition-level means of five fold MAEs; the individual fold-level results are shown in @suppfig-full-fold-mae, @suppfig-partial-fold-mae, and @suppfig-embedding-fold-mae. Each value in the main boxplots averages performance over the five test folds. Their spread therefore describes differences between repetitions of the complete cross-validation procedure. The supplementary fold-level boxplots additionally show how performance varies between test subsets within each repetition. The repetitions reuse the same underlying trials and are not independent experimental datasets. The comparisons reported here are descriptive and do not establish statistical significance. Model initialization and mini-batch shuffling used fixed seeds; varying these seeds would be needed to assess additional sensitivity to optimization randomness.
+
+Model evaluation focused on final cumulative ammonia emissions. Although the neural network predicts the full emission dynamics, final cumulative loss is often the quantity of greatest practical interest for emission inventories, fertilizer management, and the assessment of mitigation strategies. The selected evaluation criterion was therefore consistent with the primary intended application. Future work could nevertheless complement this assessment with metrics describing the temporal dynamics, particularly when the timing and rate of emissions are also relevant to the intended use of the model.
+
+From a practical perspective, source-domain pretraining is a useful option when few target micrometeorological trials are available, but its performance should be checked against both target-only neural networks and simple constant predictors. The largest gains over direct neural-network training generally occurred at low $p$, while positive median differences persisted at the largest sample size tested. The usefulness of alternative-method measurements should be assessed by comparing predictions with and without the intermediate fine-tuning stage on these data. Larger or better-matched datasets could help identify when this extra adaptation stage is beneficial. Approaches that explicitly account for domain heterogeneity, such as physically meaningful pivot variables, domain-specific adapters, or shared architectures with method-specific prediction heads, could further improve transfer [@blitzer2006domain; @rebuffi2017learning; @zhang2021survey].
+
+# Conclusions
+
+This study investigated transfer learning for ammonia emission prediction under limited target micrometeorological data availability. With full fine-tuning, source-domain pretraining yielded lower median MAEs than direct target-only neural-network training for both cattle and pig across all positive target sample sizes examined. However, the target mean predictor remained competitive for cattle with few target trials, demonstrating the importance of evaluating transfer against simple benchmarks.
+
+The additional value of alternative-method data was domain-dependent. An intermediate fine-tuning stage generally produced modest gains for cattle with CaractAir, wind tunnel, and dynamic chamber data, but tended to increase errors for pig. Pretraining only on CaractAir or wind tunnel data did not fully substitute for source-domain pretraining. Together, these results support source pretraining as a useful component of ammonia emission prediction while emphasizing that the benefit of sequential adaptation depends on the target origin, data characteristics, and parameter-update scheme.
+
+```{=latex}
+\clearpage
+```
+
+# Appendix A. Additional results {.unnumbered}
+
+::: {#suppfig-transfer-ft1-cps-and-chamber fig-pos="H"}
+
+```{r}
+#| label: plot-fig-s1
+#| dependson: prepare-full-data
+#| fig-width: 14
+#| fig-height: 10
+#| out-width: "100%"
+
+# ---------------------------------------------------------------------
+### Figure S1
+fig_S1 = df_plot_full %>%
+
+    filter (alternative_method %in% c ("x = Dyn. chamber", "x = Cps")) %>%
+
+    ggplot () +
+        geom_boxplot (aes (x = p, y = mae, fill = Model), outlier.alpha = 0.45) +
+        geom_hline(
+            data = df_hline_full,
+            aes(yintercept = yintercept),
+            linewidth = 0.8,
+            linetype = 2
+        ) +
+
+        facet_grid (alternative_method ~ origin, scales = "free_y") +
+
+        scale_fill_manual (values = c ("source_to_target_mm" = Dark2[2],
+                                       "source_to_alternative_to_target_mm" = "#F28E2B",
+                                       "alternative_to_target_mm" = "#FBBF77",
+                                       "target_mm_only" = "#A6CEE3",
+                                       "target_mean" = "#1F78B4"),
+                           breaks = c ("source_to_target_mm", "source_to_alternative_to_target_mm", "alternative_to_target_mm", "target_mm_only", "target_mean"),
+                           labels = expression (paste ("1-", bar (E(A)), "-2-", plain(mm)[italic(p)], "(A)"),
+                                                paste ("1-", bar (E(A)), "-2-x(A)-3-", plain(mm)[italic(p)], "(A)"),
+                                                paste ("1-x(A)-2-", plain(mm)[italic(p)], "(A)"),
+                                                paste ("1-", plain(mm)[italic(p)], "(A)"),
+                                                paste ("mean-model-", plain(mm)[italic(p)], "(A)"))) +
+
+        guides (fill = guide_legend(nrow = 2, byrow = TRUE)) +
+
+        scale_y_log10() +
+        xlab ("p") +
+        ylab (expression("MAE (kg N-" * plain(NH)[3] * " ha"^{-1} * ")"))
+
+fig_S1
+```
+
+Mean absolute error of the models defined in Table [-@tbl-model-list] for $x = \mathrm{cps}$ (calibrated passive sampler; top row) and $x = \mathrm{cham}$ (dynamic chamber; bottom row), with fine-tuning performed by updating all model parameters. Boxplots show the distribution of the 10 repetition-level MAEs, each computed as the arithmetic mean of the five test-fold MAEs. The dashed horizontal line indicates the mean MAE of the target-only neural-network benchmark trained using all non-test target micrometeorological trials, computed over all repetitions and folds. The y-axis is logarithmic.
+
 :::
 
-## Quarto
+::: {#suppfig-transfer-ft2-all-methods fig-pos="H"}
 
-[Quarto](https://quarto.org/) is a versatile formatting system for authoring documents integrating markdown, LaTeX and code blocks interpreted either via Jupyter or Knitr (thus supporting Python, R and Julia). It relies on the [Pandoc](https://pandoc.org/MANUAL.html) document converter.
+```{r}
+#| label: plot-fig-s2
+#| dependson: prepare-partial-data
+#| fig-width: 14
+#| fig-height: 14
+#| out-width: "100%"
 
-## Requirements
+df_arrows_fig_S2 = df_plot_partial %>%
+    summarise (
+        hidden_mae = max (mae),
+        upper_fence = quantile (mae, 0.75) + 1.5 * IQR (mae),
+        box_upper = max (mae[mae <= upper_fence]),
+        outlier_label = paste (
+            round (sort (mae[mae > upper_fence], decreasing = TRUE), 1),
+            collapse = "\n"
+        ),
+        .by = c (origin, alternative_method, Model, p)
+    ) %>%
+    filter (hidden_mae > 38) %>%
+    mutate (
+        label = paste0 (outlier_label, "\n\u2191"),
+        label_y = box_upper * 1.18
+    )
 
-You need [quarto](https://quarto.org/) installed on your system and the [Computo extension](https://github.com/computorg/computo-quarto-extension) to prepare your document. For the latter, once quarto is installed, run the following to install the extension in the current directory (it creates a `_extension` directory which is ignored by git thanks to `.gitignore` by default):
+df_hidden_outlier_fig_S2 = df_plot_partial %>%
+    mutate (
+        upper_fence = quantile (mae, 0.75) + 1.5 * IQR (mae),
+        group_max = max (mae),
+        .by = c (origin, alternative_method, Model, p)
+    ) %>%
+    filter (group_max > 38, mae > upper_fence, mae <= 38)
 
-```.bash
-quarto add computorg/computo-quarto-extension
+
+fig_S2 = df_plot_partial %>%
+    ggplot () +
+        geom_boxplot (aes (x = p, y = mae, fill = Model), outlier.alpha = 0.45) +
+        geom_hline(
+            data = df_hline_partial,
+            aes(yintercept = yintercept),
+            linewidth = 0.8,
+            linetype = 2
+        ) +
+        geom_point (
+            data = df_hidden_outlier_fig_S2 %>%
+                filter (Model == "alternative_to_target_mm"),
+            aes (x = p, y = mae),
+            position = position_nudge (x = 0.25),
+            colour = "#f3faff",
+            size = 2.5,
+            inherit.aes = FALSE
+        ) +
+        geom_text (
+            data = df_arrows_fig_S2 %>%
+                filter (Model == "source_to_alternative_to_target_mm"),
+            aes (x = p, y = label_y * 1.08, label = label),
+            inherit.aes = FALSE,
+            size = 3.5 
+        ) +
+        geom_text (
+            data = df_arrows_fig_S2 %>%
+                filter (Model == "alternative_to_target_mm"),
+            aes (x = p, y = label_y * 1.05, label = label),
+            position = position_nudge (x = 0.25),
+            inherit.aes = FALSE,
+            size = 3.5
+        ) +
+        facet_grid (alternative_method ~ origin, scales = "free_y") +
+        scale_y_log10 () +
+        coord_cartesian (ylim = c (NA, 38)) +
+        scale_fill_manual (values = c ("source_to_target_mm" = Dark2[2],
+                                       "source_to_alternative_to_target_mm" = "#F28E2B",
+                                       "alternative_to_target_mm" = "#FBBF77",
+                                       "target_mm_only" = "#A6CEE3",
+                                       "target_mean" = "#1F78B4"),
+                           breaks = c ("source_to_target_mm", "source_to_alternative_to_target_mm", "alternative_to_target_mm", "target_mm_only", "target_mean"),
+                           labels = expression (paste ("1-", bar (E(A)), "-2-", plain(mm)[italic(p)], "(A)"),
+                                                paste ("1-", bar (E(A)), "-2-x(A)-3-", plain(mm)[italic(p)], "(A)"),
+                                                paste ("1-x(A)-2-", plain(mm)[italic(p)], "(A)"),
+                                                paste ("1-", plain(mm)[italic(p)], "(A)"),
+                                                paste ("mean-model-", plain(mm)[italic(p)], "(A)"))) +
+        guides (fill = guide_legend(nrow = 2, byrow = TRUE)) +
+        xlab ("p") +
+        ylab (expression("MAE (kg N-" * plain(NH)[3] * " ha"^{-1} * ")")) +
+    theme(strip.text.y = element_text(size = 18))
+
+fig_S2
 ```
 
-[`R`](https://www.r-project.org/) and the following `R` packages must be installed on your computer: [`knitr`](https://cran.r-project.org/package=knitr), [`markdown`](https://cran.r-project.org/package=markdown).
+Mean absolute error of the models defined in Table [-@tbl-model-list], with fine-tuning performed by updating the embeddings and the post-RNN MLP only. Boxplots show the distribution of the 10 repetition-level MAEs, each computed as the arithmetic mean of the five test-fold MAEs. The dashed horizontal line indicates the mean MAE of the target-only neural-network benchmark trained using all non-test target micrometeorological trials, computed over all repetitions and folds. The y-axis is logarithmic and the displayed range is capped at a MAE of 38. Arrow annotations list the upper outliers of the affected boxplots, including a value below the cap, in place of their individual points.
 
-# Formatting
-
-This section covers basic formatting guidelines for quarto documents.
-
-To render a document, run `quarto render`. By default, both PDF and HTML documents are generated:
-
-```.bash
-quarto render # will render both to html and PDF
-```
-
-::: {.callout-tip}
-## Note
-
-To check the syntax of the formatting below, you can use the `</> source` button at the top left of this document.
 :::
 
-## Basic markdown formatting
+::: {#suppfig-transfer-ft3-all-methods fig-pos="H"}
 
-**Bold text** or _italic_
+```{r}
+#| label: plot-fig-s3
+#| dependson: prepare-embedding-data
+#| fig-width: 14
+#| fig-height: 13
+#| out-width: "100%"
 
-- This is a list
-- With more elements
-- It isn't numbered.
+fig_S3 = df_plot_embedding %>%
+    ggplot () +
+        geom_boxplot (aes (x = p, y = mae, fill = Model), outlier.alpha = 0.45) +
+        geom_hline(
+            data = df_hline_embedding,
+            aes(yintercept = yintercept),
+            linewidth = 0.8,
+            linetype = 2
+        ) +
+        facet_grid (alternative_method ~ origin, scales = "free_y") +
+        scale_fill_manual (values = c ("source_to_target_mm" = Dark2[2],
+                                       "source_to_alternative_to_target_mm" = "#F28E2B",
+                                       "alternative_to_target_mm" = "#FBBF77",
+                                       "target_mm_only" = "#A6CEE3",
+                                       "target_mean" = "#1F78B4"),
+                           breaks = c ("source_to_target_mm", "source_to_alternative_to_target_mm", "alternative_to_target_mm", "target_mm_only", "target_mean"),
+                           labels = expression (paste ("1-", bar (E(A)), "-2-", plain(mm)[italic(p)], "(A)"),
+                                                paste ("1-", bar (E(A)), "-2-x(A)-3-", plain(mm)[italic(p)], "(A)"),
+                                                paste ("1-x(A)-2-", plain(mm)[italic(p)], "(A)"),
+                                                paste ("1-", plain(mm)[italic(p)], "(A)"),
+                                                paste ("mean-model-", plain(mm)[italic(p)], "(A)"))) +
+        guides (fill = guide_legend(nrow = 2, byrow = TRUE)) +
+        xlab ("p") +
+        ylab (expression("MAE (kg N-" * plain(NH)[3] * " ha"^{-1} * ")")) +
+    theme(strip.text.x = element_text(size = 20),
+          strip.text.y = element_text(size = 18))
 
-But we can also do a numbered list
+fig_S3
+```
 
-1. This is my first item
-2. This is my second item
-3. This is my third item
+MAEs for fertilizer-origin-embedding-only fine-tuning. Boxplots show the 10 repetition-level MAEs, each computed as the mean of five test-fold MAEs. All model parameters except the fertilizer-origin embedding were frozen during fine-tuning. The dashed horizontal line indicates the mean MAE of the target-only neural-network benchmark trained using all non-test target micrometeorological trials, computed over all repetitions and folds.
 
-## Mathematics
-
-### Mathematical formulae
-
-[LaTeX](https://www.latex-project.org/) code is natively supported[^lualatex], which makes it possible to use mathematical formulae:
-
-[^lualatex]: We use [lualatex](https://lualatex.org/) for this purpose.
-
-$$
-f(x_1, \dots, x_n; \mu, \sigma^2) =
-\frac{1}{\sigma \sqrt{2\pi}} \exp{\left(- \frac{1}{2\sigma^2}\sum_{i=1}^n(x_i - \mu)^2\right)}
-$$
-
-It is also possible to cross-reference an equation, see @eq-mylabel:
-
-$$
-\begin{aligned}
-D_{x_N} & = \frac12
-\left[\begin{array}{cc}
-x_L^\top & x_N^\top \end{array}\right] \,
-\left[\begin{array}{cc}  L_L & B \\ B^\top & L_N \end{array}\right] \,
-\left[\begin{array}{c}
-x_L \\ x_N \end{array}\right] \\
-& = \frac12 (x_L^\top L_L x_L + 2 x_N^\top B^\top x_L + x_N^\top L_N x_N),
-\end{aligned}
-$$ {#eq-mylabel}
-
-### Theorems and other amsthem-like environments
-
-Quarto includes a nice support for theorems, with predefined prefix labels for theorems, lemmas, proposition, etc. see [this page](https://quarto.org/docs/authoring/cross-references.html#theorems-and-proofs). Here is a simple example:
-
-::: {#thm-slln}
-## Strong law of large numbers
-
-The sample average converges almost surely to the expected value:
-
-$$\overline{X}_n\ \xrightarrow{\text{a.s.}}\ \mu \qquad\textrm{when}\ n \to \infty.$$
 :::
 
-See @thm-slln.
+::: {#suppfig-variability-of-emissions fig-pos="H"}
 
-## R Code
+```{r}
+#| label: plot-fig-s4
+#| fig-width: 14
+#| fig-height: 9.8 
+#| out-width: "100%"
 
-Quarto uses either Jupyter or knitr to render code chunks. This can be triggered in the yaml header. In this tutorial, we use `knitr` (`R` and packages `knitr`, `markdown` must be installed on your computer).
+data = read.csv("02_scripts/00_data_preparation/data_without_caractair.csv")
 
-``` yaml
----
-title: "My Document"
-author: "Jane Doe"
----
+data_tmp = data %>%
+  filter (meas_tech_origin == "micro met") %>%
+  filter (fer_origin_origin %in% c ("pig", "cat")) %>%
+  filter (ct_origin == max (ct_origin), .by = id) %>%
+  mutate (fer_origin_origin = recode (fer_origin_origin, "pig" = "Pig", "cat" = "Cattle"))
+
+data_tmp_quantiles = data_tmp %>%
+  summarise (q = list (quantile (e_cum_origin, probs = c (0.1, 0.5, 0.9), na.rm = TRUE)),
+             .by = fer_origin_origin) %>%
+  unnest_longer (q, values_to = "e_cum_quantile")
+
+data_tmp_mean = data_tmp %>%
+  summarise (e_cum_mean = mean (e_cum_origin, na.rm = TRUE), .by = fer_origin_origin)
+
+fig_S4 = data_tmp %>%
+  ggplot () +
+    geom_histogram (aes (x = e_cum_origin), fill = "#67c5a7", color = "white") +
+    geom_vline (data = data_tmp_quantiles,
+                aes (xintercept = e_cum_quantile),
+                color = "red",
+                linetype = "dashed",
+                linewidth = 1) +
+    geom_vline (data = data_tmp_mean,
+                aes (xintercept = e_cum_mean),
+                color = "black",
+                linetype = "solid",
+                linewidth = 1) +
+    facet_wrap (~ fer_origin_origin, nrow = 2) +
+    xlab (expression("Final cumulative emissions (kg N-" * plain(NH)[3] * " ha"^{-1} * ")")) +
+    ylab ("Number of plots") +
+    theme (strip.text = element_text (size = 20),
+           axis.title.x = element_text (margin = margin(t = 10)),
+           panel.spacing = grid::unit(2, "lines"))
+
+fig_S4
 ```
 
-`R` code [@R-base] chunks may be embedded as follows:
+Distribution of final cumulative ammonia emissions for cattle and pig fertilizer origins based on micrometeorological measurements. The solid black vertical line represents the mean value, and the three dashed red vertical lines correspond to the 0.1, 0.5, and 0.9 quantiles.
 
-```{r r-code, echo=TRUE}
-x <- rnorm(10)
-```
-
-## Figures
-
-Plots can be generated as follows:
-
-```{r pressure, message = FALSE}
-library("ggplot2")
-p <- ggplot(mpg, aes(displ, hwy)) +
-  geom_point() +
-  geom_smooth()
-p
-```
-
-It is also possible to create figures from static images:
-
-:::{#fig-logo}
-
-![](https://raw.githubusercontent.com/computorg/comm/main/design/logo_text_vertical.png){height=200}
-
-Computo logo (label)
 :::
 
-**Note:** _Until Quarto version 1.3+ is released, including a remote image (from a web URL) in a document (like the image above) will work in the rendered HTML document but will generate an error when building the PDF document (c.f. [related bug report](https://github.com/quarto-dev/quarto-cli/issues/4443))._
+::: {#suppfig-fer-characteristics-cattle-vs-non-cattle fig-pos="H"}
 
-## Tables
+```{r}
+#| label: plot-fig-s5
+#| fig-width: 14
+#| fig-height: 12
+#| out-width: "100%"
 
-Tables (with label: `@tbl-mylabel` renders @tbl-mylabel) can be generated with markdown as follows
-
-| Tables   |      Are      |  Cool |
-|----------|:-------------:|------:|
-| col 1 is |  left-aligned | $1600 |
-| col 2 is |    centered   |   $12 |
-| col 3 is | right-aligned |    $1 |
-: my table caption {#tbl-mylabel}
-
-Table can also be generated by some code, for instance with knitr here:
-
-```{r cars}
-knitr::kable(summary(cars), caption = "Table caption.")
+include_precomputed_figure("fig_S5")
 ```
 
-## Handling references {#sec-references}
-
-### Bibliographic references
-
-References are displayed as footnotes using
-[BibTeX](http://www.bibtex.org/), e.g. `[@computo]` will be displayed
-as [@computo], where `computo` is the bibtex key for this specific
-entry. The bibliographic information is automatically retrieved from
-the `.bib` file specified in the header of this document (here:
-`references.bib`).
-
-### Other cross-references
-
-As already (partially) seen, Quarto includes a mechanism similar to the
-bibliographic references for sections, equations, theorems, figures,
-lists, etc. Have a look at [this
-page](https://quarto.org/docs/authoring/cross-references.html).
-
-## Advanced formatting
-
-Advanced formatting features are possible and documented (including interactive plots, pseudo-code, (Tikz) diagrams, Lua filters, mixing R + Python in the same document), but are beyond the scope of this simple introduction. We list a few useful resources below.
-
-::: {.callout-warning}
-## More information
-
-- [The Quarto web site](https://quarto.org) for comprehensive documentation, including:
-  + [Tutorial](https://quarto.org/docs/get-started/)
-  + [User guide](https://quarto.org/docs/guide/)
-  + [Options reference](https://quarto.org/docs/reference/)
-
-- [The template distributed with the Computo Quarto extension](https://computo.sfds.asso.fr/computo-quarto-extension/), which uses such advanced features.
-
-- [Our mock version of the t-SNE paper](https://computo.sfds.asso.fr/published-paper-tsne/), a full and advanced example using Python and the Jupyter kernel.
-
-- [The previously published papers in Computo](https://computo.sfds.asso.fr/publications/) can be used as references.
+Comparison of the distributions of continuous predictors between micrometeorological cattle trials and non-cattle trials. The widths of the boxplots are proportional to the number of observations.
 
 :::
+
+::: {#suppfig-fer-characteristics-pig-vs-non-pigs fig-pos="H"}
+
+```{r}
+#| label: plot-fig-s6
+#| fig-width: 14
+#| fig-height: 12
+#| out-width: "100%"
+
+include_precomputed_figure("fig_S6")
+```
+
+Comparison of the distributions of continuous predictors between micrometeorological pig trials and non-pig trials. The widths of the boxplots are proportional to the number of observations.
+
+:::
+
+::: {#suppfig-final-cumulative-emissions-by-measurement-methods fig-pos="H"}
+
+```{r}
+#| label: plot-fig-s7
+#| fig-width: 10
+#| fig-height: 8
+#| out-width: "100%"
+
+include_precomputed_figure("fig_S7")
+```
+
+Distribution of final cumulative ammonia emissions for micrometeorological and non-micrometeorological measurement methods in the full dataset.
+
+:::
+
+::: {#suppfig-full-fold-mae fig-pos="H"}
+
+```{r}
+#| label: plot-fig-s8
+#| dependson: prepare-full-data
+#| fig-width: 14
+#| fig-height: 14
+#| out-width: "100%"
+
+# ---------------------------------------------------------------------
+### Figure S8
+
+fig_S8 = df_plot_folds_full %>%
+    ggplot () +
+        geom_boxplot (aes (x = p, y = mae, fill = Model), outlier.alpha = 0.45) +
+        geom_hline(
+            data = df_hline_full,
+            aes(yintercept = yintercept),
+            linewidth = 0.8,
+            linetype = 2
+        ) +
+        facet_grid (alternative_method ~ origin, scales = "free_y") +
+        scale_fill_manual (values = c ("source_to_target_mm" = Dark2[2],
+                                       "source_to_alternative_to_target_mm" = "#F28E2B",
+                                       "alternative_to_target_mm" = "#FBBF77",
+                                       "target_mm_only" = "#A6CEE3",
+                                       "target_mean" = "#1F78B4"),
+                           breaks = c ("source_to_target_mm", "source_to_alternative_to_target_mm", "alternative_to_target_mm", "target_mm_only", "target_mean"),
+                           labels = expression (paste ("1-", bar (E(A)), "-2-", plain(mm)[italic(p)], "(A)"),
+                                                paste ("1-", bar (E(A)), "-2-x(A)-3-", plain(mm)[italic(p)], "(A)"),
+                                                paste ("1-x(A)-2-", plain(mm)[italic(p)], "(A)"),
+                                                paste ("1-", plain(mm)[italic(p)], "(A)"),
+                                                paste ("mean-model-", plain(mm)[italic(p)], "(A)"))) +
+        guides (fill = guide_legend(nrow = 2, byrow = TRUE)) +
+        scale_y_log10 () +
+        xlab ("p") +
+        ylab (expression("MAE (kg N-" * plain(NH)[3] * " ha"^{-1} * ")"))
+
+fig_S8
+```
+
+Full fine-tuning: distribution of the 50 individual fold-level MAEs per configuration across 10 repetitions of five-fold cross-validation, shown on a logarithmic y-axis. Values are not averaged within repetition. Colors identify the plotted strategies and target benchmarks. The dashed horizontal line is the mean MAE of the target-only benchmark with all non-test target trials.
+
+:::
+
+::: {#suppfig-partial-fold-mae fig-pos="H"}
+
+```{r}
+#| label: plot-fig-s9
+#| dependson: prepare-partial-data
+#| fig-width: 14
+#| fig-height: 14
+#| out-width: "100%"
+
+fig_S9 = df_plot_folds_partial %>%
+    ggplot () +
+        geom_boxplot (aes (x = p, y = mae, fill = Model), outlier.alpha = 0.45) +
+        geom_hline(
+            data = df_hline_partial,
+            aes(yintercept = yintercept),
+            linewidth = 0.8,
+            linetype = 2
+        ) +
+        facet_grid (alternative_method ~ origin, scales = "free_y") +
+        scale_fill_manual (values = c ("source_to_target_mm" = Dark2[2],
+                                       "source_to_alternative_to_target_mm" = "#F28E2B",
+                                       "alternative_to_target_mm" = "#FBBF77",
+                                       "target_mm_only" = "#A6CEE3",
+                                       "target_mean" = "#1F78B4"),
+                           breaks = c ("source_to_target_mm", "source_to_alternative_to_target_mm", "alternative_to_target_mm", "target_mm_only", "target_mean"),
+                           labels = expression (paste ("1-", bar (E(A)), "-2-", plain(mm)[italic(p)], "(A)"),
+                                                paste ("1-", bar (E(A)), "-2-x(A)-3-", plain(mm)[italic(p)], "(A)"),
+                                                paste ("1-x(A)-2-", plain(mm)[italic(p)], "(A)"),
+                                                paste ("1-", plain(mm)[italic(p)], "(A)"),
+                                                paste ("mean-model-", plain(mm)[italic(p)], "(A)"))) +
+        guides (fill = guide_legend(nrow = 2, byrow = TRUE)) +
+        scale_y_log10 () +
+        xlab ("p") +
+        ylab (expression("MAE (kg N-" * plain(NH)[3] * " ha"^{-1} * ")")) +
+    theme(strip.text.y = element_text(size = 18))
+
+fig_S9
+```
+
+Partial fine-tuning: distribution of the 50 individual fold-level MAEs per configuration across 10 repetitions of five-fold cross-validation, shown on a logarithmic y-axis. Only the embeddings and post-RNN MLP are updated during fine-tuning. Values are not averaged within repetition. The dashed horizontal line is the mean MAE of the target-only benchmark with all non-test target trials.
+
+:::
+
+::: {#suppfig-embedding-fold-mae fig-pos="H"}
+
+```{r}
+#| label: plot-fig-s10
+#| dependson: prepare-embedding-data
+#| fig-width: 14
+#| fig-height: 14
+#| out-width: "100%"
+
+fig_S10 = df_plot_folds_embedding %>%
+    ggplot () +
+        geom_boxplot (aes (x = p, y = mae, fill = Model), outlier.alpha = 0.45) +
+        geom_hline(
+            data = df_hline_embedding,
+            aes(yintercept = yintercept),
+            linewidth = 0.8,
+            linetype = 2
+        ) +
+        facet_grid (alternative_method ~ origin, scales = "free_y") +
+        scale_fill_manual (values = c ("source_to_target_mm" = Dark2[2],
+                                       "source_to_alternative_to_target_mm" = "#F28E2B",
+                                       "alternative_to_target_mm" = "#FBBF77",
+                                       "target_mm_only" = "#A6CEE3",
+                                       "target_mean" = "#1F78B4"),
+                           breaks = c ("source_to_target_mm", "source_to_alternative_to_target_mm", "alternative_to_target_mm", "target_mm_only", "target_mean"),
+                           labels = expression (paste ("1-", bar (E(A)), "-2-", plain(mm)[italic(p)], "(A)"),
+                                                paste ("1-", bar (E(A)), "-2-x(A)-3-", plain(mm)[italic(p)], "(A)"),
+                                                paste ("1-x(A)-2-", plain(mm)[italic(p)], "(A)"),
+                                                paste ("1-", plain(mm)[italic(p)], "(A)"),
+                                                paste ("mean-model-", plain(mm)[italic(p)], "(A)"))) +
+        guides (fill = guide_legend(nrow = 2, byrow = TRUE)) +
+        scale_y_log10 () +
+        xlab ("p") +
+        ylab (expression("MAE (kg N-" * plain(NH)[3] * " ha"^{-1} * ")")) +
+    theme(strip.text.x = element_text(size = 20),
+          strip.text.y = element_text(size = 18))
+
+fig_S10
+```
+
+Fertilizer-origin-embedding-only fine-tuning: distribution of the 50 individual fold-level MAEs per configuration across 10 repetitions of five-fold cross-validation, shown on a logarithmic y-axis. Values are not averaged within repetition. The dashed horizontal line indicates the mean MAE of the target-only benchmark trained using all non-test target trials.
+
+:::
+
+```{=latex}
+\clearpage
+```
+
+# Appendix B. Preprocessing of the data {.unnumbered}
+
+## B1. ALFAM2 dataset {.unnumbered}
+
+### B1.1. Excluded data {.unnumbered}
+
+**Excluded measurement intervals**:
+
+-   For plots containing a missing value in ammonia emissions at a given interval i, all intervals following interval i were excluded.
+
+-   For plots where the time gap between the end of interval i and the beginning of interval i+1 exceeded 0.5 h, all intervals following interval i were excluded.
+
+**Excluded plots**
+
+-   plots with relative emissions greater than 1.2 or lower than -0.05
+
+-   plots containing only one observation
+
+-   plots with unknown TAN application rate
+
+-   control plots (no fertilizer applied)
+
+-   plots associated with various issues identified through the variable 'flag.plot'
+
+-   plots for which measurements started more than 0.5 h after fertilizer application
+
+-   plots for which cumulative ammonia emissions remained equal to zero over an initial period $[0,t_0]$, with $t_0>0$, and began to increase only after $t_0$, whereas emissions were expected to start immediately after fertilizer application
+
+-   experiments 7 and 8 (eid=7,8): several treatments were reported although no distinction between them could be identified from the covariates, while strong variability was observed in the response
+
+### B1.2. Treatment identification {.unnumbered}
+
+Since treatments were not systematically identified in ALFAM2, a complete review of the database was conducted to properly identify all treatments within each experiment.
+
+## B2. DetAir dataset {.unnumbered}
+
+Here, the term plot is also used to refer to an experiment--treatment--cell combination, despite the fact that fertilizer application was performed in laboratory cells rather than field plots.
+
+### B2.1. Excluded data {.unnumbered}
+
+-   plots with fertilizer applied directly onto PVC (no soil)
+
+-   plots involving compost or manure that had previously been frozen
+
+-   plots involving synthetic fertilizers
+
+-   plots involving solid forms of human-derived fertilizers
+
+### B2.2. New variables {.unnumbered}
+
+Additional variables were created in order to match variables available in ALFAM2 but absent from the DetAir dataset: application method = broadcast, incorporation = none, till = none, crop = none, air temperature = 15°C, wind speed at 2m height (m/s) = 2, rain rate = 0 (mm/h), time of incorporation (h) = not applicable, furrow depth (cm) = not applicable, crop height (cm) = not applicable.
+
+## B3. After merging the two datasets {.unnumbered}
+
+### B3.1. Excluded data {.unnumbered}
+
+For plots containing more than 200 measurement intervals, only one observation approximately every 4 h was retained in order to reduce heterogeneity in the number of measurements across plots.
+
+### B3.2. Normalization {.unnumbered}
+
+All numerical variables were normalized using the transformation
+
+$$x \mapsto \frac{x}{\max_i |x_i|}$$
+
+where $x \in \mathbb{R}^n$ and $n$ denotes the number of observations. This transformation ensured that all normalized variables were bounded between $-1$ and $1$.
+
+### B3.3. Handling of missing values {.unnumbered}
+
+Different cases were distinguished. For plot-level variables, NAs in categorical variables were replaced by \"unknown\", whereas NAs in numerical variables were replaced by the value 2 (after normalization). For the dynamic variables air temperature and wind speed, NAs were linearly interpolated for plots with less than 100% missing values; for the remaining plots, NAs were replaced by the value 2 (after normalization). For rain rate, NAs were replaced by 0.
+
+### B3.4. Handling of Non-Applicable Values (NCs) {.unnumbered}
+
+NCs in categorical variables were replaced by \"not_applicable\". NCs in numerical variables were replaced by the value $-2$ after normalization.
+
+### B3.5. Addition of Indicator Variables for NAs and NCs {.unnumbered}
+
+For each variable containing at least one NA or NC value, an indicator variable was added, taking the value 0 when the associated variable was known, 2 when the associated value was NA, and $-2$ when the associated value was NC.
+
+# Code and data availability {.unnumbered}
+
+The source code, public ALFAM2-derived data, and model evaluation results are available on GitHub at: <https://github.com/armandfavrot/Evaluating-transfer-learning-for-ammonia-emission-prediction-under-limited-data-availability>. The CaractAir data are restricted and are not distributed publicly. Figure [-@fig-data-description], @suppfig-fer-characteristics-cattle-vs-non-cattle, @suppfig-fer-characteristics-pig-vs-non-pigs, and @suppfig-final-cumulative-emissions-by-measurement-methods are supplied as precomputed illustrations because they include these restricted data. The three methodological diagrams are also included as precomputed illustrations, with their TikZ sources provided separately. The other figures are regenerated during rendering from the public prepared dataset or the supplied evaluation results; no model training is performed during rendering.
+
+# Author contributions {.unnumbered}
+
+**Armand Favrot**: Writing – original draft, Visualization, Software, Methodology, Investigation, Formal analysis, Data curation, Conceptualization. **David Makowski**: Writing – review and editing, Visualization, Validation, Supervision, Resources, Project administration, Methodology, Investigation, Funding acquisition, Formal analysis, Conceptualization. **Vincent Guigue**: Writing – review and editing, Visualization, Validation, Supervision, Project administration, Methodology, Investigation, Formal analysis, Conceptualization. **Céline Décuq**: Writing – review and editing, Visualization, Validation, Supervision, Resources, Project administration, Methodology, Investigation, Funding acquisition, Formal analysis, Conceptualization. **Sophie Génermont**: Writing – review and editing, Visualization, Validation, Supervision, Resources, Project administration, Methodology, Investigation, Funding acquisition, Formal analysis, Conceptualization.
+
+# Competing interests {.unnumbered}
+
+The authors declare that they have no known competing financial interests or personal relationships that could have appeared to influence the work reported in this paper.
+
+# Acknowledgements {.unnumbered}
+
+This work was supported by the French ANR under the \"Investissements d'avenir\" programme with the reference ANR-16-CONV-0003 and from the AgroEcoSystem department of INRAE. This work was granted access to the HPC resources of IDRIS under the allocation 2024-AD011015906 made by GENCI. During the preparation of this work the authors used ChatGPT in order to improve the readability and language of the manuscript. After using this tool/service, the authors reviewed and edited the content as needed and take full responsibility for the content of the published article.
 
 # References {.unnumbered}
 
 ::: {#refs}
 :::
-
-# Session information {.appendix .unnumbered}
-
-```{r session-info}
-sessionInfo()
-```
-

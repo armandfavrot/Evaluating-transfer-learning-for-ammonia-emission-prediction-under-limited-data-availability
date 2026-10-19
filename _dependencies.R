@@ -7,3 +7,12 @@
 # Computo extension) to render R plots with native SVG transparency
 # support.
 library(svglite)
+
+library(dplyr)
+library(ggplot2)
+library(gridExtra)
+library(knitr)
+library(rmarkdown)
+library(tibble)
+library(tidyr)
+library(stringr)

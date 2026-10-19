@@ -1,0 +1,60 @@
+{
+  "script": "transfer_03.py",
+  "status": "completed",
+  "start_time": "2026-09-30T10:39:15+02:00",
+  "end_time": "2026-10-01T18:17:24+02:00",
+  "elapsed_seconds": 113888.74,
+  "elapsed_time": "31 h 38 min 09 s",
+  "device": {
+    "name": "cuda:0",
+    "gpu": "NVIDIA T400"
+  },
+  "finetuning_scheme": "fertilizer-origin embedding only",
+  "parameters": {
+    "fertilizer_origins": [
+      "cat",
+      "pig"
+    ],
+    "alternative_methods": [
+      "CaractAir",
+      "wt",
+      "chamber",
+      "cps"
+    ],
+    "n_repetitions": 10,
+    "n_folds": 5,
+    "p_values": [
+      10,
+      20,
+      40,
+      80
+    ],
+    "num_epochs": 1500,
+    "patience": 100,
+    "batch_size": 32,
+    "initial_learning_rate": 0.0001,
+    "finetuning_learning_rate": 0.002,
+    "hidden_size": 512,
+    "num_layers": 1,
+    "bidirectional": true,
+    "partition_seeds": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10
+    ],
+    "training_seed": 1,
+    "cudnn_deterministic": true
+  },
+  "software": {
+    "python": "3.12.3",
+    "pytorch": "2.6.0+cu124",
+    "cuda": "12.4"
+  }
+}

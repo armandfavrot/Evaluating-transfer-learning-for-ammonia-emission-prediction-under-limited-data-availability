@@ -74,3 +74,17 @@ cache/
 # <<< computorg base <<<
 
 /.quarto/
+
+# Generated model artefacts
+**/models/
+**/losses/
+**/prediction_results.pkl
+**/mae_results.pkl
+**/source_mean_results.pkl
+**/target_mean_results.pkl
+
+# Restricted data and personal files
+/01_data/data_caractair.csv
+/02_scripts/00_data_preparation/data.csv
+/04_perso/
+
