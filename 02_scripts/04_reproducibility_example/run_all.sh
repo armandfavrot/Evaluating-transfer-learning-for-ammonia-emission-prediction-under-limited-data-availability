@@ -21,4 +21,9 @@ printf '\n[2/3] Running transfer_01.py\n'
 python3 transfer_01.py
 
 printf '\n[3/3] Creating reproducibility figures\n'
-Rscript results_transfer_01.R
+cd "$SCRIPT_DIR/../.."
+
+Rscript -e '
+    setwd("02_scripts/04_reproducibility_example")
+    source("results_transfer_01.R")
+'
