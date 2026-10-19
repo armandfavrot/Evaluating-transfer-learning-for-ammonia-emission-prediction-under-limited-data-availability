@@ -16,10 +16,10 @@ transfer-learning experiments.
 01_data/
     Input datasets
 02_scripts/
-    00_data_preparation/       Data preparation
-    01_transfer_learning/      Complete transfer-learning experiments
-    02_figures/                Article figures
-    03_tables/                 Article tables
+    00_data_preparation/         Data preparation
+    01_transfer_learning/        Complete transfer-learning experiments
+    02_figures/                  Article figures
+    03_tables/                   Article tables
     04_reproducibility_example/  Lightweight reproducibility example
 ```
 

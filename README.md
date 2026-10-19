@@ -1,7 +1,5 @@
-# Evaluating transfer learning for ammonia emission prediction under
-limited data availability
-Armand Favrot, Sophie Génermont, Vincent Guigue, Céline Décuq, David
-Makowski
+# Evaluating transfer learning for ammonia emission prediction under limited data availability
+Armand Favrot, Sophie Génermont, Vincent Guigue, Céline Décuq, David Makowski
 2026-09-23
 
 ### Citation
