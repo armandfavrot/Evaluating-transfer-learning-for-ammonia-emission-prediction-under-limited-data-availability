@@ -19,18 +19,18 @@ author:
     affiliations:
       - ref: ecosys
       - ref: mia
-  - name: Sophie Génermont
+  - name: David Makowski
     affiliations:
-      - ref: ecosys
+      - ref: mia
   - name: Vincent Guigue
     affiliations:
       - ref: mia
   - name: Céline Décuq
     affiliations:
       - ref: ecosys
-  - name: David Makowski
+  - name: Sophie Génermont
     affiliations:
-      - ref: mia
+      - ref: ecosys
 affiliations:
   - id: ecosys
     name: Université Paris-Saclay, INRAE, AgroParisTech, UMR EcoSys, Palaiseau, 91120, France
