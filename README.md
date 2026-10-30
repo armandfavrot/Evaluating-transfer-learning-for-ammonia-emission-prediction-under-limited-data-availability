@@ -1,5 +1,7 @@
-# Evaluating transfer learning for ammonia emission prediction under limited data availability
-Armand Favrot, Sophie Génermont, Vincent Guigue, Céline Décuq, David Makowski
+# Evaluating transfer learning for ammonia emission prediction under
+limited data availability
+Armand Favrot, David Makowski, Vincent Guigue, Céline Décuq, Sophie
+Génermont
 2026-09-23
 
 ### Citation
@@ -19,10 +21,10 @@ License](https://i.creativecommons.org/l/by/4.0/80x15.png)](http://creativecommo
 ### Authors’ affiliations
 
 - Armand Favrot (Université Paris-Saclay, INRAE, AgroParisTech, UMR EcoSys, Palaiseau, 91120, France, Université Paris-Saclay, INRAE, AgroParisTech, UMR MIA-PS, Palaiseau, 91120, France)
-- Sophie Génermont (Université Paris-Saclay, INRAE, AgroParisTech, UMR EcoSys, Palaiseau, 91120, France)
+- David Makowski (Université Paris-Saclay, INRAE, AgroParisTech, UMR MIA-PS, Palaiseau, 91120, France)
 - Vincent Guigue (Université Paris-Saclay, INRAE, AgroParisTech, UMR MIA-PS, Palaiseau, 91120, France)
 - Céline Décuq (Université Paris-Saclay, INRAE, AgroParisTech, UMR EcoSys, Palaiseau, 91120, France)
-- David Makowski (Université Paris-Saclay, INRAE, AgroParisTech, UMR MIA-PS, Palaiseau, 91120, France)
+- Sophie Génermont (Université Paris-Saclay, INRAE, AgroParisTech, UMR EcoSys, Palaiseau, 91120, France)
 
 ### Abstract
 
